@@ -1,0 +1,21 @@
+<div class="confirm-dialog-container" [ngClass]="'status-' + data.status">
+  <div class="header">
+    <div class="icon-container">
+      <i *ngIf="data.status === 'danger'" class="fas fa-exclamation-triangle"></i>
+      <i *ngIf="data.status === 'info'" class="fas fa-info-circle"></i>
+      <i *ngIf="data.status === 'error'" class="fas fa-times-circle"></i>
+      <i *ngIf="data.status === 'success'" class="fas fa-check-circle"></i>
+      <i *ngIf="data.status === 'warning'" class="fas fa-exclamation-circle"></i>
+    </div>
+    <h1 mat-dialog-title class="title">{{ data.title }}</h1>
+  </div>
+
+  <div mat-dialog-content class="content">
+    <p>{{ data.message }}</p>
+  </div>
+
+  <div mat-dialog-actions class="actions">
+    <button mat-button class="cancel-button" (click)="onCancel()">{{ data.cancelText }}</button>
+    <button mat-flat-button class="confirm-button" (click)="onConfirm()">{{ data.confirmText }}</button>
+  </div>
+</div> 

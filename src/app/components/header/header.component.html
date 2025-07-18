@@ -1,0 +1,106 @@
+<!-- Modern Responsive Header -->
+<header class="bg-gradient-to-br from-blue-900 to-gray-900 shadow-md fixed w-full top-0 z-50">
+  <div class="container mx-auto px-4">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo and Brand -->
+      <div class="flex items-center">
+        <a [routerLink]="['/']" class="flex items-center space-x-3">
+          <img src="assets/images/armor_soldier_ninja_avatar_wheel_war_warrior_helm_game_icon_262426.png" alt="KMA Legend Logo" class="h-10 w-auto">
+          <span class="text-lg font-semibold text-white block">KMA Legend</span>
+        </a>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex space-x-8">
+        <a [routerLink]="['/']" routerLinkActive="!text-blue-400" [routerLinkActiveOptions]="{exact: true}"
+           class="text-gray-300 hover:text-blue-400 font-bold transition-colors duration-200">Trang chủ</a>
+        <a [routerLink]="['/schedule']" routerLinkActive="!text-blue-400"
+           class="text-gray-300 hover:text-blue-400 font-bold transition-colors duration-200">Lịch học</a>
+        <a [routerLink]="['/scores']" routerLinkActive="!text-blue-400"
+           class="text-gray-300 hover:text-blue-400 font-bold transition-colors duration-200">Điểm số</a>
+        <a [routerLink]="['/scholarship']" routerLinkActive="!text-blue-400"
+           class="text-gray-300 hover:text-blue-400 font-bold transition-colors duration-200">Học bổng</a>
+        <a [routerLink]="['/virtual-calendar']" routerLinkActive="!text-blue-400"
+           class="text-gray-300 hover:text-blue-400 font-bold transition-colors duration-200">Xếp lịch học ảo</a>
+        <a [routerLink]="['/about']" routerLinkActive="!text-blue-400"
+           class="text-gray-300 hover:text-blue-400 font-bold transition-colors duration-200">Chương trình học</a>
+        <a [routerLink]="['/buy-me-coffee']" routerLinkActive="!text-blue-400"
+           class="text-gray-300 hover:text-blue-400 font-bold transition-colors duration-200">Buy me a coffee</a>
+        <a [routerLink]="['/feedback']" routerLinkActive="!text-blue-400"
+           class="text-gray-300 hover:text-blue-400 font-bold transition-colors duration-200">Góp ý</a>
+      </nav>
+
+      <!-- User Menu -->
+      <div class="hidden md:flex items-center space-x-4">
+        <div class="notifications-container">
+          <button (click)="toggleNotifications()" class="relative text-gray-300 hover:text-blue-400 transition-colors duration-200">
+            <i class="fas fa-bell text-xl"></i>
+            <span *ngIf="getUnreadCount() > 0" 
+                  class="notification-badge absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+              {{getUnreadCount()}}
+            </span>
+          </button>
+
+          <!-- Backdrop -->
+          <div *ngIf="isNotificationOpen" 
+               class="notifications-backdrop"
+               (click)="toggleNotifications()">
+          </div>
+
+          <!-- Notifications Panel -->
+          <div *ngIf="isNotificationOpen" 
+               class="notifications-dropdown notification-panel">
+            <div class="px-4 py-2 border-b border-gray-200">
+              <h3 class="text-lg font-semibold text-gray-800">Thông báo</h3>
+            </div>
+            <div class="max-h-96 overflow-y-auto">
+              <div *ngFor="let notification of notifications" 
+                   class="notification-item px-4 py-3 border-b border-gray-100 last:border-b-0">
+                <div class="flex items-start">
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-800">{{notification.message}}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{formatDate(notification.date)}}</p>
+                  </div>
+                  <div *ngIf="!notification.isRead" 
+                       class="w-2 h-2 bg-blue-500 rounded-full mt-2">
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="notifications.length === 0" 
+                   class="px-4 py-3 text-center text-gray-500">
+                Không có thông báo nào
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button class="md:hidden text-gray-300 hover:text-blue-400" (click)="toggleMobileMenu()">
+        <i class="fas" [ngClass]="{'fa-times': isMobileMenuOpen, 'fa-bars': !isMobileMenuOpen}"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="md:hidden bg-gradient-to-br from-blue-900 to-gray-900" [ngClass]="{'block': isMobileMenuOpen, 'hidden': !isMobileMenuOpen}">
+    <div class="px-2 pt-2 pb-3 space-y-1">
+      <a [routerLink]="['/']" routerLinkActive="!bg-blue-800 !text-blue-400" [routerLinkActiveOptions]="{exact: true}"
+         (click)="closeMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-blue-800 hover:text-blue-400">Trang chủ</a>
+      <a [routerLink]="['/schedule']" routerLinkActive="!bg-blue-800 !text-blue-400" (click)="closeMobileMenu()"
+         class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-blue-800 hover:text-blue-400">Lịch học</a>
+      <a [routerLink]="['/scores']" routerLinkActive="!bg-blue-800 !text-blue-400" (click)="closeMobileMenu()"
+         class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-blue-800 hover:text-blue-400">Điểm số</a>
+      <a [routerLink]="['/scholarship']" routerLinkActive="!bg-blue-800 !text-blue-400" (click)="closeMobileMenu()"
+         class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-blue-800 hover:text-blue-400">Học bổng</a>
+      <a [routerLink]="['/virtual-calendar']" routerLinkActive="!bg-blue-800 !text-blue-400" (click)="closeMobileMenu()"
+         class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-blue-800 hover:text-blue-400">Xếp lịch học ảo</a>
+      <a [routerLink]="['/about']" routerLinkActive="!bg-blue-800 !text-blue-400" (click)="closeMobileMenu()"
+         class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-blue-800 hover:text-blue-400">Chương trình học</a>
+      <a [routerLink]="['/buy-me-coffee']" routerLinkActive="!bg-blue-800 !text-blue-400" (click)="closeMobileMenu()"
+         class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-blue-800 hover:text-blue-400">Buy me a coffee</a>
+      <a [routerLink]="['/feedback']" routerLinkActive="!bg-blue-800 !text-blue-400" (click)="closeMobileMenu()"
+         class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-blue-800 hover:text-blue-400">Góp ý</a>
+    </div>
+  </div>
+</header>

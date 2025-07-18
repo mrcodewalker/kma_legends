@@ -1,0 +1,62 @@
+.confirm-dialog-container {
+  @apply flex flex-col w-full;
+  width: calc(100% - 32px);
+  margin: 16px;
+  max-width: 500px;
+
+  .header {
+    @apply flex items-start sm:items-center p-4 sm:p-6 pb-2 sm:pb-4;
+    .icon-container {
+      @apply text-3xl sm:text-4xl mr-3 sm:mr-4 flex-shrink-0;
+    }
+    .title {
+      @apply text-xl sm:text-2xl font-bold break-words leading-tight;
+    }
+  }
+
+  .content {
+    @apply px-4 sm:px-6 pb-4 sm:pb-6 text-gray-600;
+    p {
+      @apply mb-2 break-words text-base;
+    }
+  }
+
+  .actions {
+    @apply flex justify-end p-3 sm:p-4 bg-gray-50 rounded-b-lg gap-2 sm:gap-3;
+    
+    button {
+      @apply px-5 sm:px-6 py-2.5 rounded-lg transition-all duration-200 font-medium text-base whitespace-nowrap;
+      min-width: 100px;
+    }
+    
+    .cancel-button {
+      @apply border border-gray-300 hover:bg-gray-100;
+    }
+    
+    .confirm-button {
+      @apply hover:opacity-90;
+    }
+  }
+
+  // Status-specific colors
+  &.status-danger {
+    .icon-container, .title { @apply text-red-500; }
+    .confirm-button { @apply bg-red-500 text-white; }
+  }
+  &.status-warning {
+    .icon-container, .title { @apply text-yellow-500; }
+    .confirm-button { @apply bg-yellow-500 text-white; }
+  }
+  &.status-success {
+    .icon-container, .title { @apply text-green-500; }
+    .confirm-button { @apply bg-green-500 text-white; }
+  }
+  &.status-info {
+    .icon-container, .title { @apply text-blue-500; }
+    .confirm-button { @apply bg-blue-500 text-white; }
+  }
+  &.status-error {
+    .icon-container, .title { @apply text-red-700; }
+    .confirm-button { @apply bg-red-700 text-white; }
+  }
+} 

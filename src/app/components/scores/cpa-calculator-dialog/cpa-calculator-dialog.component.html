@@ -1,0 +1,101 @@
+<div class="p-6">
+  <h2 mat-dialog-title class="text-2xl font-bold mb-6 text-gray-800">
+    Tính toán CPA mục tiêu
+  </h2>
+
+  <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="bg-blue-50 p-4 rounded-lg">
+      <h3 class="text-lg font-semibold mb-2">Thông tin hiện tại</h3>
+      <div class="space-y-2">
+        <p class="flex justify-between">
+          <span class="text-gray-600">Chương trình:</span>
+          <span class="font-medium">{{selectedProgram?.name || 'Không xác định'}}</span>
+        </p>
+        <p class="flex justify-between">
+          <span class="text-gray-600">Tổng số tín chỉ:</span>
+          <span class="font-medium">{{selectedProgram?.totalCredits || 'N/A'}}</span>
+        </p>
+        <p class="flex justify-between">
+          <span class="text-gray-600">Số tín chỉ đã hoàn thành:</span>
+          <span class="font-medium">{{data.completedCredits}}</span>
+        </p>
+        <p class="flex justify-between">
+          <span class="text-gray-600">Số môn trượt:</span>
+          <span class="font-medium text-red-600">{{data.failedSubjects}}</span>
+        </p>
+        <p class="flex justify-between">
+          <span class="text-gray-600">CPA hiện tại:</span>
+          <span class="font-medium">{{data.currentCPA.toFixed(2)}}</span>
+        </p>
+      </div>
+    </div>
+
+    <form [formGroup]="calculatorForm" class="bg-gray-50 p-4 rounded-lg">
+      <h3 class="text-lg font-semibold mb-4">Nhập CPA mục tiêu</h3>
+      <div class="space-y-4">
+        <div>
+          <label for="targetCPA" class="block text-sm font-medium text-gray-700 mb-1">
+            CPA mục tiêu (0-4)
+          </label>
+          <input
+            type="number"
+            id="targetCPA"
+            formControlName="targetCPA"
+            class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            min="0"
+            max="4"
+            step="0.01"
+          >
+          <div *ngIf="calculatorForm.get('targetCPA')?.invalid && calculatorForm.get('targetCPA')?.touched"
+               class="text-red-500 text-sm mt-1">
+            CPA mục tiêu phải từ 0 đến 4
+          </div>
+        </div>
+        <button
+          (click)="calculate()"
+          [disabled]="calculatorForm.invalid"
+          class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Tính toán
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="calculation" class="mb-6">
+    <div class="bg-green-50 p-4 rounded-lg" *ngIf="isPossible()">
+      <h3 class="text-lg font-semibold text-green-800 mb-2">Kết quả tính toán</h3>
+      <div class="space-y-2">
+        <p class="flex justify-between">
+          <span class="text-gray-600">Số tín chỉ còn lại:</span>
+          <span class="font-medium">{{calculation!.remainingCredits || 0}}</span>
+        </p>
+        <p class="flex justify-between">
+          <span class="text-gray-600">GPA cần đạt cho các môn còn lại:</span>
+          <span class="font-medium text-green-600">{{calculation!.requiredGPA!.toFixed(2) || 0}}</span>
+        </p>
+        <p class="text-sm text-gray-500 mt-2">
+          * Để đạt được CPA {{calculation!.targetCPA || 0}}, bạn cần đạt GPA {{calculation!.requiredGPA!.toFixed(2) || 0}} 
+          cho {{calculation!.remainingCredits || 0}} tín chỉ còn lại.
+        </p>
+      </div>
+    </div>
+
+    <div class="bg-red-50 p-4 rounded-lg" *ngIf="!isPossible()">
+      <h3 class="text-lg font-semibold text-red-800 mb-2">Không thể đạt được</h3>
+      <p class="text-sm text-red-600">
+        Với CPA hiện tại và số tín chỉ còn lại, không thể đạt được CPA mục tiêu {{calculation!.targetCPA || 0}}.
+        Vui lòng điều chỉnh mục tiêu của bạn.
+      </p>
+    </div>
+  </div>
+
+  <div class="flex justify-end">
+    <button
+      (click)="close()"
+      class="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300"
+    >
+      Đóng
+    </button>
+  </div>
+</div> 

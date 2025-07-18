@@ -1,0 +1,83 @@
+:host {
+  display: block;
+}
+
+::ng-deep .grade-conversion-dialog {
+  .mat-mdc-dialog-container {
+    padding: 0;
+  }
+
+  .mdc-dialog__surface {
+    border-radius: 12px;
+    overflow: hidden;
+    @media (min-width: 641px) {
+      max-width: 600px !important;
+    }
+  }
+}
+
+// Override Material Dialog styles for mobile
+::ng-deep .mat-mdc-dialog-container {
+  --mdc-dialog-container-shape: 12px;
+  @media (max-width: 640px) {
+    --mdc-dialog-container-shape: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  ::ng-deep .grade-conversion-dialog {
+    .mat-mdc-dialog-container {
+      padding: 0 !important;
+    }
+
+    .mdc-dialog__surface {
+      margin: 0 !important;
+      width: 100vw !important;
+      border-radius: 0 !important;
+    }
+  }
+
+  ::ng-deep .cdk-overlay-pane {
+    max-width: 100vw !important;
+  }
+
+  ::ng-deep .cdk-global-overlay-wrapper {
+    justify-content: center !important;
+    align-items: center !important;
+  }
+}
+
+.close-button {
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+  
+  i {
+    font-size: 1.1rem;
+  }
+}
+
+button {
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  }
+}
+
+tr {
+  &.bg-green-50:hover {
+    background-color: #e8f5e9 !important;
+  }
+  &.bg-blue-50:hover {
+    background-color: #e3f2fd !important;
+  }
+  &.bg-yellow-50:hover {
+    background-color: #fffde7 !important;
+  }
+  &.bg-orange-50:hover {
+    background-color: #fff3e0 !important;
+  }
+  &.bg-red-50:hover {
+    background-color: #ffebee !important;
+  }
+} 

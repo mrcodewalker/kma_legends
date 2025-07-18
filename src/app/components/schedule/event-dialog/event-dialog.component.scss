@@ -1,0 +1,54 @@
+.event-dialog {
+  @apply p-4;
+  min-width: 320px;
+  max-width: 500px;
+  width: 90vw;
+
+  .dialog-header {
+    @apply flex justify-between items-center mb-4;
+
+    h2 {
+      @apply m-0;
+    }
+
+    .close-button {
+      @apply text-gray-500 hover:text-gray-700;
+    }
+  }
+
+  .content-grid {
+    @apply grid gap-4;
+
+    .info-item {
+      @apply flex flex-col;
+
+      .label {
+        @apply text-sm text-gray-600 mb-1;
+      }
+
+      .value {
+        @apply text-base text-gray-800 font-medium;
+      }
+    }
+  }
+
+  mat-dialog-actions {
+    @apply mt-4;
+
+    .close-btn {
+      @apply bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors;
+    }
+  }
+}
+
+// Responsive styles
+@media (max-width: 640px) {
+  .event-dialog {
+    width: 95vw;
+    padding: 16px;
+
+    .content-grid {
+      gap: 12px;
+    }
+  }
+} 

@@ -1,0 +1,197 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center; // Changed from flex-start to center
+  justify-content: center;
+  background-image: url('/assets/images/3409297.jpg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  padding: 2rem 1rem; // Changed from 100px 1rem 1rem to equal padding
+}
+
+.login-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); // Adjust opacity here
+}
+
+.login-box {
+  position: relative;
+  width: 100%;
+  max-width: 90%; // Changed from 85%
+  padding: 2rem; // Increased base padding
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: fadeIn 0.5s ease-out;
+
+  @media (min-width: 480px) {
+    max-width: 450px; // Increased from 380px
+    padding: 2.5rem; // Increased padding
+  }
+
+  @media (min-width: 768px) {
+    max-width: 500px; // Increased from 400px
+    padding: 3rem; // Increased padding
+  }
+
+  @media (min-width: 1024px) {
+    max-width: 550px; // Increased from 420px
+  }
+}
+
+.logo-container {
+  text-align: center;
+  margin-bottom: 2rem; // Increased from 1.5rem
+  
+  .logo {
+    width: 100px; // Reduced from 120px
+    height: auto;
+    margin: 0 auto;
+
+    @media (min-width: 768px) {
+      width: 120px; // Reduced from 150px
+    }
+
+    @media (min-width: 1024px) {
+      width: 130px; // Added specific size for laptop screens
+    }
+  }
+}
+
+.login-title {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+
+  @media (min-width: 768px) {
+    font-size: 1.8rem;
+  }
+}
+
+.login-form {
+  .form-group {
+    margin-bottom: 1.25rem;
+    
+    label {
+      display: block;
+      color: white;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      
+      i {
+        margin-right: 0.5rem;
+      }
+    }
+    
+    input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: white;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+      }
+      
+      &:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+      }
+      
+      &.error {
+        border-color: #ff4444;
+      }
+    }
+  }
+}
+
+.error-message {
+  color: #ff4444;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.login-button {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  .button-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    .loading-spinner {
+      width: 20px;
+      height: 20px;
+      margin-right: 0.5rem;
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+.error-container {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 59, 48, 0.1);
+  border-radius: 8px;
+  color: #ff3b30;
+  display: flex;
+  align-items: center;
+  
+  i {
+    margin-right: 0.5rem;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+} 

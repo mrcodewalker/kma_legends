@@ -1,0 +1,636 @@
+<!-- Program Selection -->
+<div class="relative container mx-auto px-4 py-8" style="margin-top: 50px;">
+  <div class="flex justify-center mb-8">
+    <div class="inline-flex rounded-md shadow-sm" role="group">
+      <button 
+        [class]="selectedProgram === 'it' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-blue-50'"
+        class="px-6 py-3 text-sm font-medium border border-gray-200 rounded-l-lg focus:z-10 focus:ring-2 focus:ring-blue-500 transition-all"
+        (click)="selectedProgram = 'it'">
+        <i class="fas fa-laptop-code mr-2"></i>
+        Công nghệ thông tin
+      </button>
+      <button 
+        [class]="selectedProgram === 'security' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-blue-50'"
+        class="px-6 py-3 text-sm font-medium border-t border-b border-gray-200 focus:z-10 focus:ring-2 focus:ring-blue-500 transition-all"
+        (click)="selectedProgram = 'security'">
+        <i class="fas fa-shield-alt mr-2"></i>
+        An toàn thông tin
+      </button>
+      <button 
+        [class]="selectedProgram === 'electronics' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-blue-50'"
+        class="px-6 py-3 text-sm font-medium border border-gray-200 rounded-r-lg focus:z-10 focus:ring-2 focus:ring-blue-500 transition-all"
+        (click)="selectedProgram = 'electronics'">
+        <i class="fas fa-microchip mr-2"></i>
+        Điện tử viễn thông
+      </button>
+    </div>
+  </div>
+
+  <!-- IT Program -->
+  <div *ngIf="selectedProgram === 'it'" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+    <!-- Existing IT program content -->
+    <div class="flex items-center mb-6">
+      <i class="fas fa-graduation-cap text-3xl text-blue-600 mr-4"></i>
+      <h1 class="text-3xl font-bold text-gray-800">{{itProgram.name}}</h1>
+    </div>
+    
+    <!-- Rest of the existing IT program content -->
+    
+    <!-- Basic Information -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100">
+        <div class="flex items-center mb-3">
+          <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+          <h3 class="font-semibold text-gray-700">Thông tin cơ bản</h3>
+        </div>
+        <ul class="space-y-2">
+          <li class="flex items-center"><i class="fas fa-hashtag text-blue-400 w-5"></i><span class="text-gray-600">Mã ngành:</span> <span class="ml-2 font-medium">{{itProgram.majorCode}}</span></li>
+          <li class="flex items-center"><i class="fas fa-layer-group text-blue-400 w-5"></i><span class="text-gray-600">Trình độ:</span> <span class="ml-2 font-medium">{{itProgram.level}}</span></li>
+          <li class="flex items-center"><i class="fas fa-award text-blue-400 w-5"></i><span class="text-gray-600">Bằng cấp:</span> <span class="ml-2 font-medium">{{itProgram.degree}}</span></li>
+          <li class="flex items-center"><i class="fas fa-university text-blue-400 w-5"></i><span class="text-gray-600">Loại hình:</span> <span class="ml-2 font-medium">{{itProgram.type}}</span></li>
+        </ul>
+      </div>
+      
+      <div class="bg-gradient-to-br from-green-50 to-teal-50 p-4 rounded-lg border border-green-100">
+        <div class="flex items-center mb-3">
+          <i class="fas fa-clock text-green-500 mr-2"></i>
+          <h3 class="font-semibold text-gray-700">Thời gian & Tín chỉ</h3>
+        </div>
+        <ul class="space-y-2">
+          <li class="flex items-center"><i class="fas fa-calendar-alt text-green-400 w-5"></i><span class="text-gray-600">Thời gian:</span> <span class="ml-2 font-medium">{{itProgram.duration}}</span></li>
+          <li class="flex items-center"><i class="fas fa-star text-green-400 w-5"></i><span class="text-gray-600">Tín chỉ:</span> <span class="ml-2 font-medium">{{itProgram.credits}}</span></li>
+          <li class="flex items-center"><i class="fas fa-code text-green-400 w-5"></i><span class="text-gray-600">Mã CT:</span> <span class="ml-2 font-medium">{{itProgram.programCode}}</span></li>
+        </ul>
+      </div>
+      
+      <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-100">
+        <div class="flex items-center mb-3">
+          <i class="fas fa-laptop-code text-purple-500 mr-2"></i>
+          <h3 class="font-semibold text-gray-700">Chuyên ngành</h3>
+        </div>
+        <p class="text-gray-600 mb-2"><i class="fas fa-check-circle text-purple-400 mr-2"></i>{{itProgram.specialization}}</p>
+        <p class="text-sm text-gray-500 mt-2"><i class="fas fa-info-circle text-purple-400 mr-2"></i>{{itProgram.approach}}</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mb-8">
+      <div class="border-b border-gray-200">
+        <nav class="flex space-x-8" aria-label="Tabs">
+          <button 
+            [class]="activeTab === 0 ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            class="border-b-2 py-4 px-6 text-sm font-medium rounded-t-lg flex items-center"
+            (click)="activeTab = 0">
+            <i class="fas fa-bullseye mr-2"></i>
+            Mục tiêu đào tạo
+          </button>
+          <button 
+            [class]="activeTab === 1 ? 'border-green-500 text-green-600 bg-green-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            class="border-b-2 py-4 px-6 text-sm font-medium rounded-t-lg flex items-center"
+            (click)="activeTab = 1">
+            <i class="fas fa-book mr-2"></i>
+            Chương trình học
+          </button>
+          <button 
+            [class]="activeTab === 2 ? 'border-purple-500 text-purple-600 bg-purple-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            class="border-b-2 py-4 px-6 text-sm font-medium rounded-t-lg flex items-center"
+            (click)="activeTab = 2">
+            <i class="fas fa-clipboard-check mr-2"></i>
+            Điều kiện
+          </button>
+        </nav>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="mt-8">
+        <!-- Mục tiêu đào tạo -->
+        <div *ngIf="activeTab === 0" class="space-y-8 animate-fade-in">
+          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-100">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-flag text-blue-500 mr-3"></i>
+              <h3 class="text-xl font-semibold text-gray-800">Mục tiêu chung</h3>
+            </div>
+            <ul class="space-y-3">
+              <li *ngFor="let goal of itProgram.objectives.general" class="flex items-start">
+                <i class="fas fa-check-circle text-blue-400 mt-1 mr-3"></i>
+                <span class="text-gray-600">{{goal}}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-lg border border-red-100">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-heart text-red-500 mr-3"></i>
+                <h3 class="text-lg font-semibold text-gray-800">Mục tiêu về chính trị, đạo đức</h3>
+              </div>
+              <ul class="space-y-3">
+                <li *ngFor="let goal of itProgram.objectives.specific.political" class="flex items-start">
+                  <i class="fas fa-star text-red-400 mt-1 mr-3"></i>
+                  <span class="text-gray-600">{{goal}}</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-lg border border-yellow-100">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-brain text-yellow-500 mr-3"></i>
+                <h3 class="text-lg font-semibold text-gray-800">Mục tiêu về kiến thức</h3>
+              </div>
+              <ul class="space-y-3">
+                <li *ngFor="let goal of itProgram.objectives.specific.knowledge" class="flex items-start">
+                  <i class="fas fa-lightbulb text-yellow-400 mt-1 mr-3"></i>
+                  <span class="text-gray-600">{{goal}}</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-gradient-to-r from-green-50 to-teal-50 p-6 rounded-lg border border-green-100">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-cogs text-green-500 mr-3"></i>
+                <h3 class="text-lg font-semibold text-gray-800">Mục tiêu về kỹ năng chuyên môn</h3>
+              </div>
+              <ul class="space-y-3">
+                <li *ngFor="let goal of itProgram.objectives.specific.professional" class="flex items-start">
+                  <i class="fas fa-tools text-green-400 mt-1 mr-3"></i>
+                  <span class="text-gray-600">{{goal}}</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-lg border border-purple-100">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-users text-purple-500 mr-3"></i>
+                <h3 class="text-lg font-semibold text-gray-800">Mục tiêu về kỹ năng xã hội</h3>
+              </div>
+              <ul class="space-y-3">
+                <li *ngFor="let goal of itProgram.objectives.specific.social" class="flex items-start">
+                  <i class="fas fa-handshake text-purple-400 mt-1 mr-3"></i>
+                  <span class="text-gray-600">{{goal}}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chương trình học -->
+        <div *ngIf="activeTab === 1" class="space-y-8 animate-fade-in">
+          <div *ngFor="let semester of itProgram.semesters; let i = index" 
+               class="bg-white border rounded-lg shadow-sm overflow-hidden">
+            <div class="p-4 border-b" [ngClass]="getSemesterHeaderClass(i)">
+              <div class="flex items-center">
+                <i [class]="getSemesterIcon(i)" class="text-2xl mr-3"></i>
+                <div>
+                  <h3 class="text-lg font-semibold text-white">{{semester.name}}</h3>
+                  <p class="text-sm text-white/80">Tổng số tín chỉ: {{getTotalCredits(semester)}}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="p-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div *ngFor="let subject of semester.subjects" 
+                     [ngClass]="getSubjectCardClass(subject)"
+                     class="p-4 rounded-lg transform hover:scale-105 transition-all duration-300 cursor-pointer">
+                  <div class="flex justify-between items-start">
+                    <div class="flex items-start">
+                      <i [class]="getSubjectIcon(subject)" class="mt-1 mr-3"></i>
+                      <div>
+                        <h4 class="font-medium">{{subject.name}}</h4>
+                        <div class="flex items-center mt-1">
+                          <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
+                          <span class="text-sm">{{subject.credits}} tín chỉ</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <span *ngIf="subject.isOptional" class="text-xs text-blue-600 mt-2 block">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Môn tự chọn
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Điều kiện -->
+        <div *ngIf="activeTab === 2" class="space-y-6 animate-fade-in">
+          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-100">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-user-graduate text-blue-500 text-2xl mr-3"></i>
+              <h3 class="text-xl font-semibold text-gray-800">Điều kiện tuyển sinh</h3>
+            </div>
+            <p class="text-gray-600 ml-9">{{itProgram.admissionRequirements}}</p>
+          </div>
+
+          <div class="bg-gradient-to-r from-green-50 to-teal-50 p-6 rounded-lg border border-green-100">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-award text-green-500 text-2xl mr-3"></i>
+              <h3 class="text-xl font-semibold text-gray-800">Điều kiện tốt nghiệp</h3>
+            </div>
+            <p class="text-gray-600 ml-9">{{itProgram.graduationConditions}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Security Program -->
+  <div *ngIf="selectedProgram === 'security'" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+    <div class="flex items-center mb-6">
+      <i class="fas fa-shield-alt text-3xl text-blue-600 mr-4"></i>
+      <h1 class="text-3xl font-bold text-gray-800">{{securityProgram.name}}</h1>
+    </div>
+
+    <!-- Basic Information -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100">
+        <div class="flex items-center mb-3">
+          <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+          <h3 class="font-semibold text-gray-700">Thông tin cơ bản</h3>
+        </div>
+        <ul class="space-y-2">
+          <li class="flex items-center"><i class="fas fa-hashtag text-blue-400 w-5"></i><span class="text-gray-600">Mã ngành:</span> <span class="ml-2 font-medium">{{securityProgram.majorCode}}</span></li>
+          <li class="flex items-center"><i class="fas fa-layer-group text-blue-400 w-5"></i><span class="text-gray-600">Trình độ:</span> <span class="ml-2 font-medium">{{securityProgram.level}}</span></li>
+          <li class="flex items-center"><i class="fas fa-award text-blue-400 w-5"></i><span class="text-gray-600">Bằng cấp:</span> <span class="ml-2 font-medium">{{securityProgram.degree}}</span></li>
+          <li class="flex items-center"><i class="fas fa-university text-blue-400 w-5"></i><span class="text-gray-600">Loại hình:</span> <span class="ml-2 font-medium">{{securityProgram.type}}</span></li>
+        </ul>
+      </div>
+      
+      <div class="bg-gradient-to-br from-green-50 to-teal-50 p-4 rounded-lg border border-green-100">
+        <div class="flex items-center mb-3">
+          <i class="fas fa-clock text-green-500 mr-2"></i>
+          <h3 class="font-semibold text-gray-700">Thời gian & Tín chỉ</h3>
+        </div>
+        <ul class="space-y-2">
+          <li class="flex items-center"><i class="fas fa-calendar-alt text-green-400 w-5"></i><span class="text-gray-600">Thời gian:</span> <span class="ml-2 font-medium">{{securityProgram.duration}}</span></li>
+          <li class="flex items-center"><i class="fas fa-star text-green-400 w-5"></i><span class="text-gray-600">Tín chỉ:</span> <span class="ml-2 font-medium">{{securityProgram.credits}}</span></li>
+        </ul>
+      </div>
+      
+      <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-100">
+        <div class="flex items-center mb-3">
+          <i class="fas fa-shield-alt text-purple-500 mr-2"></i>
+          <h3 class="font-semibold text-gray-700">Chuyên ngành</h3>
+        </div>
+        <div class="space-y-3">
+          <div *ngFor="let spec of securityProgram.specializations" class="p-2 rounded bg-white/50">
+            <p class="font-medium text-gray-700">{{spec.code}}: {{spec.name}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mb-8">
+      <div class="border-b border-gray-200">
+        <nav class="flex space-x-8" aria-label="Tabs">
+          <button 
+            [class]="activeTab === 0 ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            class="border-b-2 py-4 px-6 text-sm font-medium rounded-t-lg flex items-center"
+            (click)="activeTab = 0">
+            <i class="fas fa-bullseye mr-2"></i>
+            Mục tiêu đào tạo
+          </button>
+          <button 
+            [class]="activeTab === 1 ? 'border-green-500 text-green-600 bg-green-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            class="border-b-2 py-4 px-6 text-sm font-medium rounded-t-lg flex items-center"
+            (click)="activeTab = 1">
+            <i class="fas fa-book mr-2"></i>
+            Chương trình học
+          </button>
+          <button 
+            [class]="activeTab === 2 ? 'border-purple-500 text-purple-600 bg-purple-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            class="border-b-2 py-4 px-6 text-sm font-medium rounded-t-lg flex items-center"
+            (click)="activeTab = 2">
+            <i class="fas fa-clipboard-check mr-2"></i>
+            Điều kiện
+          </button>
+        </nav>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="mt-8">
+        <!-- Mục tiêu đào tạo -->
+        <div *ngIf="activeTab === 0" class="space-y-8 animate-fade-in">
+          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-100">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-flag text-blue-500 mr-3"></i>
+              <h3 class="text-xl font-semibold text-gray-800">Mục tiêu chung</h3>
+            </div>
+            <ul class="space-y-3">
+              <li *ngFor="let goal of securityProgram.objectives.general" class="flex items-start">
+                <i class="fas fa-check-circle text-blue-400 mt-1 mr-3"></i>
+                <span class="text-gray-600">{{goal}}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="grid grid-cols-1 gap-6">
+            <div *ngFor="let spec of securityProgram.specializations" 
+                 class="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-lg border border-purple-100">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-shield-alt text-purple-500 mr-3"></i>
+                <h3 class="text-lg font-semibold text-gray-800">{{spec.name}}</h3>
+              </div>
+              <p class="text-gray-600 mb-4">{{spec.description}}</p>
+              <ul class="space-y-3">
+                <li *ngFor="let obj of spec.objectives" class="flex items-start">
+                  <i class="fas fa-check-circle text-purple-400 mt-1 mr-3"></i>
+                  <span class="text-gray-600">{{obj}}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chương trình học -->
+        <div *ngIf="activeTab === 1" class="space-y-8 animate-fade-in">
+          <div *ngFor="let semester of securityProgram.semesters; let i = index" 
+               class="bg-white border rounded-lg shadow-sm overflow-hidden">
+            <div class="p-4 border-b" [ngClass]="getSemesterHeaderClass(i)">
+              <div class="flex items-center">
+                <i [class]="getSemesterIcon(i)" class="text-2xl mr-3"></i>
+                <div>
+                  <h3 class="text-lg font-semibold text-white">{{semester.name}}</h3>
+                  <p class="text-sm text-white/80">Tổng số tín chỉ: {{getTotalCredits(semester)}}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="p-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div *ngFor="let subject of semester.subjects" 
+                     [ngClass]="getSubjectCardClass(subject)"
+                     class="p-4 rounded-lg transform hover:scale-105 transition-all duration-300 cursor-pointer">
+                  <div class="flex justify-between items-start">
+                    <div class="flex items-start">
+                      <i [class]="getSubjectIcon(subject)" class="mt-1 mr-3"></i>
+                      <div>
+                        <h4 class="font-medium">{{subject.name}}</h4>
+                        <div class="flex items-center mt-1">
+                          <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
+                          <span class="text-sm">{{subject.credits}} tín chỉ</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <span *ngIf="subject.isOptional" class="text-xs text-blue-600 mt-2 block">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Môn tự chọn
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Điều kiện -->
+        <div *ngIf="activeTab === 2" class="space-y-6 animate-fade-in">
+          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-100">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-user-graduate text-blue-500 text-2xl mr-3"></i>
+              <h3 class="text-xl font-semibold text-gray-800">Điều kiện tuyển sinh</h3>
+            </div>
+            <p class="text-gray-600 ml-9">{{securityProgram.admissionRequirements}}</p>
+          </div>
+
+          <div class="bg-gradient-to-r from-green-50 to-teal-50 p-6 rounded-lg border border-green-100">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-award text-green-500 text-2xl mr-3"></i>
+              <h3 class="text-xl font-semibold text-gray-800">Điều kiện tốt nghiệp</h3>
+            </div>
+            <p class="text-gray-600 ml-9">{{securityProgram.graduationConditions}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Electronics Program -->
+  <div *ngIf="selectedProgram === 'electronics'" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+    <div class="flex items-center mb-6">
+      <i class="fas fa-microchip text-3xl text-blue-600 mr-4"></i>
+      <h1 class="text-3xl font-bold text-gray-800">{{electronicsProgram.name}}</h1>
+    </div>
+
+    <!-- Basic Information -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100">
+        <div class="flex items-center mb-3">
+          <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+          <h3 class="font-semibold text-gray-700">Thông tin cơ bản</h3>
+        </div>
+        <ul class="space-y-2">
+          <li class="flex items-center"><i class="fas fa-hashtag text-blue-400 w-5"></i><span class="text-gray-600">Mã ngành:</span> <span class="ml-2 font-medium">{{electronicsProgram.majorCode}}</span></li>
+          <li class="flex items-center"><i class="fas fa-layer-group text-blue-400 w-5"></i><span class="text-gray-600">Trình độ:</span> <span class="ml-2 font-medium">{{electronicsProgram.level}}</span></li>
+          <li class="flex items-center"><i class="fas fa-award text-blue-400 w-5"></i><span class="text-gray-600">Bằng cấp:</span> <span class="ml-2 font-medium">{{electronicsProgram.degree}}</span></li>
+          <li class="flex items-center"><i class="fas fa-university text-blue-400 w-5"></i><span class="text-gray-600">Loại hình:</span> <span class="ml-2 font-medium">{{electronicsProgram.type}}</span></li>
+        </ul>
+      </div>
+      
+      <div class="bg-gradient-to-br from-green-50 to-teal-50 p-4 rounded-lg border border-green-100">
+        <div class="flex items-center mb-3">
+          <i class="fas fa-clock text-green-500 mr-2"></i>
+          <h3 class="font-semibold text-gray-700">Thời gian & Tín chỉ</h3>
+        </div>
+        <ul class="space-y-2">
+          <li class="flex items-center"><i class="fas fa-calendar-alt text-green-400 w-5"></i><span class="text-gray-600">Thời gian:</span> <span class="ml-2 font-medium">{{electronicsProgram.duration}}</span></li>
+          <li class="flex items-center"><i class="fas fa-star text-green-400 w-5"></i><span class="text-gray-600">Tín chỉ:</span> <span class="ml-2 font-medium">{{electronicsProgram.credits}}</span></li>
+        </ul>
+      </div>
+      
+      <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-100">
+        <div class="flex items-center mb-3">
+          <i class="fas fa-microchip text-purple-500 mr-2"></i>
+          <h3 class="font-semibold text-gray-700">Chuyên ngành</h3>
+        </div>
+        <p class="text-gray-600">{{electronicsProgram.specialization}}</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mb-8">
+      <div class="border-b border-gray-200">
+        <nav class="flex space-x-8" aria-label="Tabs">
+          <button 
+            [class]="activeTab === 0 ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            class="border-b-2 py-4 px-6 text-sm font-medium rounded-t-lg flex items-center"
+            (click)="activeTab = 0">
+            <i class="fas fa-bullseye mr-2"></i>
+            Mục tiêu đào tạo
+          </button>
+          <button 
+            [class]="activeTab === 1 ? 'border-green-500 text-green-600 bg-green-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            class="border-b-2 py-4 px-6 text-sm font-medium rounded-t-lg flex items-center"
+            (click)="activeTab = 1">
+            <i class="fas fa-book mr-2"></i>
+            Chương trình học
+          </button>
+          <button 
+            [class]="activeTab === 2 ? 'border-purple-500 text-purple-600 bg-purple-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            class="border-b-2 py-4 px-6 text-sm font-medium rounded-t-lg flex items-center"
+            (click)="activeTab = 2">
+            <i class="fas fa-clipboard-check mr-2"></i>
+            Điều kiện & Cơ hội
+          </button>
+        </nav>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="mt-8">
+        <!-- Mục tiêu đào tạo -->
+        <div *ngIf="activeTab === 0" class="space-y-8 animate-fade-in">
+          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-100">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-flag text-blue-500 mr-3"></i>
+              <h3 class="text-xl font-semibold text-gray-800">Mục tiêu chung</h3>
+            </div>
+            <ul class="space-y-3">
+              <li *ngFor="let goal of electronicsProgram.objectives.general" class="flex items-start">
+                <i class="fas fa-check-circle text-blue-400 mt-1 mr-3"></i>
+                <span class="text-gray-600">{{goal}}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-lg border border-red-100">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-heart text-red-500 mr-3"></i>
+                <h3 class="text-lg font-semibold text-gray-800">Mục tiêu về chính trị, đạo đức</h3>
+              </div>
+              <ul class="space-y-3">
+                <li *ngFor="let goal of electronicsProgram.objectives.specific.political" class="flex items-start">
+                  <i class="fas fa-star text-red-400 mt-1 mr-3"></i>
+                  <span class="text-gray-600">{{goal}}</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-lg border border-yellow-100">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-brain text-yellow-500 mr-3"></i>
+                <h3 class="text-lg font-semibold text-gray-800">Mục tiêu về kiến thức</h3>
+              </div>
+              <ul class="space-y-3">
+                <li *ngFor="let goal of electronicsProgram.objectives.specific.knowledge" class="flex items-start">
+                  <i class="fas fa-lightbulb text-yellow-400 mt-1 mr-3"></i>
+                  <span class="text-gray-600">{{goal}}</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-gradient-to-r from-green-50 to-teal-50 p-6 rounded-lg border border-green-100">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-cogs text-green-500 mr-3"></i>
+                <h3 class="text-lg font-semibold text-gray-800">Mục tiêu về kỹ năng chuyên môn</h3>
+              </div>
+              <ul class="space-y-3">
+                <li *ngFor="let goal of electronicsProgram.objectives.specific.professional" class="flex items-start">
+                  <i class="fas fa-tools text-green-400 mt-1 mr-3"></i>
+                  <span class="text-gray-600">{{goal}}</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-lg border border-purple-100">
+              <div class="flex items-center mb-4">
+                <i class="fas fa-users text-purple-500 mr-3"></i>
+                <h3 class="text-lg font-semibold text-gray-800">Mục tiêu về kỹ năng xã hội</h3>
+              </div>
+              <ul class="space-y-3">
+                <li *ngFor="let goal of electronicsProgram.objectives.specific.social" class="flex items-start">
+                  <i class="fas fa-handshake text-purple-400 mt-1 mr-3"></i>
+                  <span class="text-gray-600">{{goal}}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chương trình học -->
+        <div *ngIf="activeTab === 1" class="space-y-8 animate-fade-in">
+          <div *ngFor="let semester of electronicsProgram.semesters; let i = index" 
+               class="bg-white border rounded-lg shadow-sm overflow-hidden">
+            <div class="p-4 border-b" [ngClass]="getSemesterHeaderClass(i)">
+              <div class="flex items-center">
+                <i [class]="getSemesterIcon(i)" class="text-2xl mr-3"></i>
+                <div>
+                  <h3 class="text-lg font-semibold text-white">{{semester.name}}</h3>
+                  <p class="text-sm text-white/80">Tổng số tín chỉ: {{getTotalCredits(semester)}}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="p-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div *ngFor="let subject of semester.subjects" 
+                     [ngClass]="getSubjectCardClass(subject)"
+                     class="p-4 rounded-lg transform hover:scale-105 transition-all duration-300 cursor-pointer">
+                  <div class="flex justify-between items-start">
+                    <div class="flex items-start">
+                      <i [class]="getSubjectIcon(subject)" class="mt-1 mr-3"></i>
+                      <div>
+                        <h4 class="font-medium">{{subject.name}}</h4>
+                        <div class="flex items-center mt-1">
+                          <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
+                          <span class="text-sm">{{subject.credits}} tín chỉ</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <span *ngIf="subject.isOptional" class="text-xs text-blue-600 mt-2 block">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Môn tự chọn
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Điều kiện & Cơ hội -->
+        <div *ngIf="activeTab === 2" class="space-y-6 animate-fade-in">
+          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-100">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-user-graduate text-blue-500 text-2xl mr-3"></i>
+              <h3 class="text-xl font-semibold text-gray-800">Điều kiện tuyển sinh</h3>
+            </div>
+            <p class="text-gray-600 ml-9">{{electronicsProgram.admissionRequirements}}</p>
+          </div>
+
+          <div class="bg-gradient-to-r from-green-50 to-teal-50 p-6 rounded-lg border border-green-100">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-award text-green-500 text-2xl mr-3"></i>
+              <h3 class="text-xl font-semibold text-gray-800">Điều kiện tốt nghiệp</h3>
+            </div>
+            <p class="text-gray-600 ml-9">{{electronicsProgram.graduationConditions}}</p>
+          </div>
+
+          <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg border border-purple-100">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-briefcase text-purple-500 text-2xl mr-3"></i>
+              <h3 class="text-xl font-semibold text-gray-800">Cơ hội nghề nghiệp</h3>
+            </div>
+            <ul class="space-y-3 ml-9">
+              <li *ngFor="let opportunity of electronicsProgram.careerOpportunities" class="flex items-start">
+                <i class="fas fa-check-circle text-purple-400 mt-1 mr-3"></i>
+                <span class="text-gray-600">{{opportunity}}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="bg-gradient-to-r from-yellow-50 to-amber-50 p-6 rounded-lg border border-yellow-100">
+            <div class="flex items-center mb-4">
+              <i class="fas fa-graduation-cap text-yellow-500 text-2xl mr-3"></i>
+              <h3 class="text-xl font-semibold text-gray-800">Hướng phát triển</h3>
+            </div>
+            <p class="text-gray-600 ml-9">{{electronicsProgram.developmentPath}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

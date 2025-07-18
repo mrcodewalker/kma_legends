@@ -1,0 +1,187 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #f3f4f6;
+}
+
+.container {
+  max-width: 1200px;
+}
+
+// Shared styles for both table containers
+.virtual-table-container,
+.main-table-container {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  border-radius: 0.5rem;
+  
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+    
+    &:hover {
+      background: #666;
+    }
+  }
+
+  // Fix header
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    
+    tr {
+      background-color: #f9fafb;
+      
+      th {
+        position: sticky;
+        top: 0;
+        background: inherit;
+        // Add shadow to bottom of header
+        &::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          width: 100%;
+          height: 2px;
+          background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.02) 100%);
+        }
+      }
+    }
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  
+  th {
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  td {
+    white-space: nowrap;
+  }
+
+  // Highlight styles
+  tbody {
+    tr {
+      transition: all 0.2s ease;
+
+      // Default row hover
+      &:hover td {
+        // background-color: #f8fafc;
+      }
+
+      // Failed subject highlight
+      &.bg-red-100 {
+        td {
+          background-color: #fee2e2;
+          position: relative;
+          font-weight: 500;
+        }
+      }
+
+      // Current semester highlight
+      &.bg-violet-100 {
+        td {
+          background-color: #ede9fe;
+          position: relative;
+        }
+        &:hover td {
+          background-color: #ddd6fe;
+        }
+      }
+
+      // Border highlight
+      &.border-l-4 {
+        td:first-child {
+          position: relative;
+          
+          &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: inherit;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Grade text colors
+.text-red-500 {
+  color: #ef4444 !important;
+}
+
+.text-red-600 {
+  color: #dc2626 !important;
+}
+
+.text-violet-500 {
+  color: #8b5cf6 !important;
+}
+
+.text-violet-600 {
+  color: #7c3aed !important;
+}
+
+.text-orange-500 {
+  color: #f97316 !important;
+}
+
+.text-orange-600 {
+  color: #ea580c !important;
+}
+
+.text-yellow-500 {
+  color: #eab308 !important;
+}
+
+.text-yellow-600 {
+  color: #ca8a04 !important;
+}
+
+.text-blue-500 {
+  color: #3b82f6 !important;
+}
+
+.text-blue-600 {
+  color: #2563eb !important;
+}
+
+.text-green-500 {
+  color: #22c55e !important;
+}
+
+.text-green-600 {
+  color: #16a34a !important;
+}
+
+// Custom tooltip styles
+::ng-deep {
+  .mat-mdc-tooltip {
+    font-size: 14px;
+    padding: 8px 12px;
+    max-width: 250px;
+    text-align: center;
+    border-radius: 4px;
+    line-height: 1.4;
+  }
+}

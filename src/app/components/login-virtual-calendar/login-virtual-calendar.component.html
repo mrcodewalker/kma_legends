@@ -1,0 +1,64 @@
+<div class="login-container">
+  <div class="login-overlay"></div>
+  <div class="login-box">
+    <div class="logo-container">
+      <img src="assets/images/kma.png" alt="Logo" class="logo">
+    </div>
+    <h2 class="login-title">Welcome Back</h2>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="username">
+          <i class="fas fa-user"></i>
+          Username
+        </label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          placeholder="Enter your username"
+          [class.error]="loginForm.get('username')?.touched && loginForm.get('username')?.invalid"
+        >
+        <div *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.invalid" class="error-message">
+          Username is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">
+          <i class="fas fa-lock"></i>
+          Password
+        </label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          placeholder="Enter your password"
+          [class.error]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+        >
+        <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="error-message">
+          Password is required
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="!loginForm.valid || isLoading"
+        class="login-button"
+      >
+        <div class="button-content">
+          <svg *ngIf="isLoading" class="loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ isLoading ? 'Logging in...' : 'Sign In' }}
+        </div>
+      </button>
+    </form>
+
+    <div *ngIf="errorMessage" class="error-container">
+      <i class="fas fa-exclamation-circle"></i>
+      {{ errorMessage }}
+    </div>
+  </div>
+</div> 

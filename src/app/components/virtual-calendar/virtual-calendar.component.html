@@ -1,0 +1,151 @@
+<!-- Course Block Selection -->
+<div class="flex flex-col gap-4 p-4 min-h-screen bg-gray-50">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sticky top-16 bg-gray-50 p-4 z-10 shadow-sm">
+    <div class="flex flex-col">
+      <label class="text-lg font-semibold mb-2">Chọn Khóa/Khối:</label>
+      <select 
+        class="p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        [(ngModel)]="selectedCourseBlock"
+        (change)="onCourseBlockSelect(selectedCourseBlock)">
+        <option value="">-- Chọn Khóa --</option>
+        <option *ngFor="let block of availableCourseBlocks" [value]="block">
+          Khóa {{block}}
+        </option>
+      </select>
+    </div>
+
+    <!-- Course Selection -->
+    <div class="flex flex-col" *ngIf="selectedCourseBlock">
+      <label class="text-lg font-semibold mb-2">Chọn Môn Học:</label>
+      <select 
+        class="p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        [(ngModel)]="selectedCourse"
+        (change)="onCourseSelect(selectedCourse)">
+        <option value="">-- Chọn Môn --</option>
+        <option *ngFor="let course of availableCourses" [value]="course.code">
+          {{course.name}} ({{course.code}})
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Class Selection Table -->
+  <div class="flex flex-col mt-4" *ngIf="selectedCourse">
+    <div class="flex items-center mb-2">
+      <button 
+        class="mr-2 px-2 py-1 text-gray-600 hover:text-gray-800 transition-colors duration-200"
+        (click)="toggleClassTable()">
+        <i class="fas" [ngClass]="isClassTableVisible ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
+      </button>
+      <label class="text-lg font-semibold">Chọn Lớp:</label>
+    </div>
+    <div class="table-container" *ngIf="isClassTableVisible" [@slideInOut]>
+      <table class="min-w-full">
+        <thead>
+          <tr>
+            <th>Lớp</th>
+            <th>Giảng viên</th>
+            <th>Địa điểm</th>
+            <th>Thời gian</th>
+            <th>Các ngày học</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let classItem of availableClasses" 
+              [ngClass]="{
+                'hover-effect': true,
+                'selected-class': isClassSelected(classItem)
+              }"
+              (click)="onClassSelect(classItem)">
+            <td>{{classItem.details.course_name}}</td>
+            <td>{{classItem.details.teacher}}</td>
+            <td>{{classItem.details.study_location}}</td>
+            <td>{{classItem.schedule.startTime}} - {{classItem.schedule.endTime}}</td>
+            <td>{{subString(classItem.schedule.days.join(', '))}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Selected Classes -->
+  <div *ngIf="temporarySelectedClasses.length > 0" class="mt-4">
+    <div class="flex items-center mb-2">
+      <button 
+        class="mr-2 px-2 py-1 text-gray-600 hover:text-gray-800 transition-colors duration-200"
+        (click)="toggleSelectedClasses()">
+        <i class="fas" [ngClass]="isSelectedClassesVisible ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
+      </button>
+      <h3 class="text-lg font-semibold">Các lớp đã chọn:</h3>
+    </div>
+    <div class="table-container" *ngIf="isSelectedClassesVisible" [@slideInOut]>
+      <table class="min-w-full">
+        <thead>
+          <tr>
+            <th>Lớp</th>
+            <th>Giảng viên</th>
+            <th>Địa điểm</th>
+            <th>Thời gian</th>
+            <th>Các ngày học</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let classItem of temporarySelectedClasses" 
+              class="hover-effect"
+              (click)="onClassSelect(classItem)">
+            <td>{{classItem.details.course_name}}</td>
+            <td>{{classItem.details.teacher}}</td>
+            <td>{{classItem.details.study_location}}</td>
+            <td>{{classItem.schedule.startTime}} - {{classItem.schedule.endTime}}</td>
+            <td>{{subString(classItem.schedule.days.join(', '))}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons mt-4">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-4 px-4">
+      <button 
+        class="px-3 md:px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center gap-1 md:gap-2 shadow-md text-xs md:text-base"
+        (click)="saveSelectedClasses()">
+        <i class="fas fa-save"></i>
+        <span>Save</span>
+      </button>
+      <button 
+        class="px-3 md:px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 flex items-center justify-center gap-1 md:gap-2 shadow-md text-xs md:text-base"
+        (click)="clearAllSelections()">
+        <i class="fas fa-trash"></i>
+        <span>Delete</span>
+      </button>
+      <button 
+        class="px-3 md:px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 flex items-center justify-center gap-1 md:gap-2 shadow-md text-xs md:text-base"
+        (click)="exportToTxt()">
+        <i class="fas fa-file-export"></i>
+        <span>Export</span>
+      </button>
+      <button 
+        class="px-3 md:px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors duration-200 flex items-center justify-center gap-1 md:gap-2 shadow-md text-xs md:text-base"
+        (click)="importFromTxt()">
+        <i class="fas fa-file-import"></i>
+        <span>Import</span>
+      </button>
+      <button 
+        class="px-3 md:px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200 flex items-center justify-center gap-1 md:gap-2 shadow-md text-xs md:text-base col-span-2 md:col-span-1"
+        (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Calendar Section -->
+<div class="mt-8 w-full">
+  <div class="bg-white rounded-lg shadow-lg p-4">
+    <h2 class="text-xl font-semibold mb-4">Lịch học</h2>
+    <full-calendar [options]="calendarOptions"></full-calendar>
+  </div>
+</div>
+

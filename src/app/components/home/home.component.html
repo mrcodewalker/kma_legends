@@ -1,0 +1,246 @@
+<div class="min-h-screen">
+  <!-- Hero Section -->
+  <section class="relative bg-gradient-to-br from-primary via-primary-light to-blue-400 min-h-screen flex items-center justify-center px-4 py-16 overflow-hidden">
+    <div class="absolute inset-0 bg-black opacity-40"></div>
+    <div class="absolute inset-0 bg-[url('/assets/images/5166950.jpg')] opacity-50"></div>
+    <div class="relative text-center text-white max-w-4xl mx-auto">
+      <h1 class="text-7xl md:text-8xl font-extrabold mb-6 animate-fade-in font-secondary">
+        KMA <span class="text-yellow-400">Legend</span>
+      </h1>
+      <p class="text-2xl md:text-3xl mb-8 opacity-90 font-primary">Hệ thống quản lý học tập thông minh</p>
+      <button class="btn-primary text-lg" (click)="this.router.navigate(['/scores'])">
+        Bắt đầu ngay
+      </button>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="py-12 bg-white relative -mt-20">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        <div class="bg-white rounded-xl shadow-lg p-6 transform hover:-translate-y-2 transition-all duration-300" 
+             *ngFor="let stat of stats">
+          <div class="flex items-center space-x-4">
+            <div class="text-primary text-3xl">
+              <i class="fas {{stat.icon}}"></i>
+            </div>
+            <div>
+              <h3 class="text-3xl font-bold text-gray-800">{{stat.value}}</h3>
+              <p class="text-gray-600">{{stat.label}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slider Section -->
+  <section class="py-20 bg-gray-50 overflow-hidden">
+    <div class="container mx-auto px-4">
+      <h2 class="section-title text-gradient mb-12">Khám phá KMA Legend</h2>
+      <div class="relative max-w-6xl mx-auto">
+        <!-- Slider Container -->
+        <div class="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
+          <!-- Slides -->
+          <div class="absolute inset-0 transition-transform duration-500 ease-in-out"
+               *ngFor="let slide of slides; let i = index"
+               [style.opacity]="currentSlide === i ? 1 : 0"
+               [style.transform]="'scale(' + (currentSlide === i ? '1' : '0.95') + ')'"
+               [style.transition]="'all 0.5s ease-in-out'">
+            <img [src]="slide.image" [alt]="slide.title" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+            <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
+              <h3 class="text-3xl font-bold mb-2">{{slide.title}}</h3>
+              <p class="text-lg opacity-90">{{slide.description}}</p>
+            </div>
+          </div>
+
+          <!-- Navigation Arrows -->
+          <button class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 backdrop-blur-sm transition-all"
+                  (click)="prevSlide()">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 backdrop-blur-sm transition-all"
+                  (click)="nextSlide()">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+
+          <!-- Dots -->
+          <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+            <button type="button" *ngFor="let slide of slides; let i = index" class="w-2 h-2 rounded-full transition-all" [ngClass]="{'bg-white': currentSlide === i, 'bg-white/50': currentSlide !== i}" (click)="setSlide(i)"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Departments Section -->
+  <section class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+      <h2 class="section-title text-gradient">Khoa & Ngành đào tạo</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-xl p-8 transform hover:-translate-y-2 transition-all duration-300 border border-gray-100 group text-center" 
+             *ngFor="let dept of departments">
+          <div class="text-primary text-5xl mb-6 group-hover:scale-110 transition-transform duration-300 flex justify-center">
+            <i class="fas {{dept.icon}}"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-4 font-secondary">{{dept.name}}</h3>
+          <p class="text-gray-600">{{dept.description}}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- News Section -->
+  <section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <h2 class="section-title">Tin tức & Sự kiện</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-all duration-300" 
+             *ngFor="let item of news">
+          <img [src]="item.image" [alt]="item.title" class="w-full h-48 object-cover">
+          <div class="p-6" (click)="openLink(item.link)">
+            <div class="text-sm text-gray-500 mb-2">{{item.date | date:'dd/MM/yyyy'}}</div>
+            <h3 class="text-xl font-bold mb-2">{{item.title}}</h3>
+            <p class="text-gray-600">{{item.description}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Achievements Section -->
+  <section class="py-20 bg-gradient-to-br from-primary to-primary-dark text-white">
+    <div class="container mx-auto px-4">
+      <h2 class="section-title text-white mb-16">Thành tựu nổi bật</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        <div class="text-center" *ngFor="let achievement of achievements">
+          <div class="text-5xl mb-4">
+            <i class="fas {{achievement.icon}}"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-2">{{achievement.title}}</h3>
+          <p class="text-white/80">{{achievement.year}}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+      <h2 class="section-title">Cựu sinh viên nói gì?</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div class="bg-white rounded-xl shadow-lg p-8 relative" *ngFor="let testimonial of testimonials">
+          <div class="absolute -top-6 left-1/2 -translate-x-1/2">
+            <img [src]="testimonial.avatar" [alt]="testimonial.name" 
+                 class="w-12 h-12 rounded-full border-4 border-white shadow-lg">
+          </div>
+          <div class="text-center pt-8">
+            <p class="text-gray-600 italic mb-4">"{{testimonial.content}}"</p>
+            <h4 class="font-bold text-lg">{{testimonial.name}}</h4>
+            <p class="text-primary">{{testimonial.position}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <h2 class="section-title text-gradient">Tính năng chính</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-xl p-8 transform hover:-translate-y-2 transition-all duration-300 border border-gray-100 group text-center" 
+             *ngFor="let feature of features">
+          <div class="text-primary text-5xl mb-6 group-hover:scale-110 transition-transform duration-300 flex justify-center">
+            <i class="fas {{feature.icon}}"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-4 font-secondary">{{feature.title}}</h3>
+          <p class="text-gray-600">{{feature.description}}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-r from-primary to-primary-dark text-white">
+    <div class="container mx-auto px-4">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6">Sẵn sàng bắt đầu?</h2>
+        <p class="text-xl mb-8 opacity-90">Tham gia ngay hôm nay để trải nghiệm những tính năng tuyệt vời của KMA Legend</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <button class="px-8 py-3 bg-white text-primary rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+            Đăng ký ngay
+          </button>
+          <button class="px-8 py-3 border-2 border-white rounded-lg font-semibold hover:bg-white/10 transition-colors">
+            Tìm hiểu thêm
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <h2 class="section-title">Về chúng tôi</h2>
+      <div class="max-w-3xl mx-auto text-center">
+        <div class="space-y-6">
+          <p class="text-xl text-gray-600 leading-relaxed">
+            KMA Legend là dự án được phát triển bởi <span class="font-bold text-primary">{{authorName}}</span>, 
+            nhằm hỗ trợ sinh viên KMA trong việc quản lý học tập hiệu quả.
+          </p>
+          <p class="text-xl text-gray-600 leading-relaxed">
+            Với các tính năng theo dõi điểm số, quản lý lịch học và lập kế hoạch học tập, 
+            chúng tôi cam kết mang đến trải nghiệm tốt nhất cho người dùng.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Location Section -->
+  <section class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+      <h2 class="section-title">Vị trí</h2>
+      <div class="max-w-5xl mx-auto">
+        <div class="rounded-2xl overflow-hidden shadow-2xl">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3725.2949345376855!2d105.793653574888!3d20.980811380656572!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135acc508f938fd%3A0x883e474806a2d1f2!2zSOG7jWMgdmnhu4duIEvhu7kgdGh14bqtdCBt4bqtdCBtw6M!5e0!3m2!1svi!2s!4v1752658883332!5m2!1svi!2s" 
+                width="100%" 
+                height="450" 
+                style="border:0;" 
+                allowfullscreen="" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade"
+                class="w-full">
+          </iframe>
+        </div>
+        <div class="mt-8 text-center">
+          <p class="text-lg text-gray-600">
+            <i class="fas fa-map-marker-alt text-primary mr-2"></i>
+            141 Đường Chiến Thắng, Tân Triều, Thanh Trì, Hà Nội
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <h2 class="section-title">Liên hệ</h2>
+      <div class="max-w-2xl mx-auto">
+        <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-8">
+          <div class="flex items-center text-gray-600">
+            <i class="fas fa-envelope text-primary text-2xl mr-4"></i>
+            <p class="text-lg">contact&#64;kmalegend.com</p>
+          </div>
+          <div class="flex items-center text-gray-600">
+            <i class="fas fa-phone text-primary text-2xl mr-4"></i>
+            <p class="text-lg">0123 456 789</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div> 

@@ -1,0 +1,70 @@
+<div class="event-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title class="text-xl font-bold text-gray-800 flex items-center">
+      <i class="fas fa-book-open text-blue-600 mr-2"></i>
+      Chi tiết môn học
+    </h2>
+    <button mat-icon-button (click)="onClose()" class="close-button">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <div class="content-grid">
+      <div class="info-item">
+        <span class="label flex items-center">
+          <i class="fas fa-graduation-cap text-blue-600 mr-2"></i>
+          Môn học
+        </span>
+        <span class="value">{{data.event.title}}</span>
+      </div>
+
+      <div class="info-item">
+        <span class="label flex items-center">
+          <i class="fas fa-hashtag text-blue-600 mr-2"></i>
+          Mã môn
+        </span>
+        <span class="value">{{data.event.courseCode}}</span>
+      </div>
+
+      <div class="info-item">
+        <span class="label flex items-center">
+          <i class="fas fa-chalkboard-teacher text-blue-600 mr-2"></i>
+          Giảng viên
+        </span>
+        <span class="value">{{data.event.teacher}}</span>
+      </div>
+
+      <div class="info-item">
+        <span class="label flex items-center">
+          <i class="fas fa-map-marker-alt text-blue-600 mr-2"></i>
+          Địa điểm
+        </span>
+        <span class="value">{{data.event.location}}</span>
+      </div>
+
+      <div class="info-item">
+        <span class="label flex items-center">
+          <i class="fas fa-calendar text-blue-600 mr-2"></i>
+          Ngày học
+        </span>
+        <span class="value">{{data.formattedDate}}</span>
+      </div>
+
+      <div class="info-item">
+        <span class="label flex items-center">
+          <i class="fas fa-clock text-blue-600 mr-2"></i>
+          Thời gian
+        </span>
+        <span class="value">{{data.formattedTime}}</span>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onClose()" class="close-btn">
+      <i class="fas fa-check mr-2"></i>
+      Đóng
+    </button>
+  </mat-dialog-actions>
+</div> 

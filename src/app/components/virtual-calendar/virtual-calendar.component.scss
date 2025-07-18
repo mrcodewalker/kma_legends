@@ -1,0 +1,139 @@
+:host {
+  display: block;
+  padding-top: 64px; // Adjust this value based on your header height
+}
+
+.selected-row {
+  @apply bg-blue-100;
+  animation: selectPulse 1s ease-in-out;
+}
+
+.hover-effect {
+  @apply transition-colors duration-300 cursor-pointer relative;
+  &:hover {
+    @apply bg-gray-50;
+  }
+}
+
+.selected-class {
+  @apply bg-blue-50;
+  position: relative;
+  animation: selectFade 0.3s ease-in-out;
+  
+  &::before {
+    position: absolute;
+    left: 0;
+    width: 24px;
+    text-align: center;
+    color: #2563eb;
+    font-weight: bold;
+    animation: checkmarkAppear 0.3s ease-in-out;
+  }
+
+  &:hover {
+    @apply bg-blue-100;
+  }
+
+  td {
+    @apply text-gray-900 font-semibold;
+    position: relative;
+    
+    &:first-child {
+      padding-left: 2.5rem !important;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        @apply bg-blue-500;
+        animation: borderSlideIn 0.3s ease-in-out;
+      }
+    }
+  }
+}
+
+@keyframes selectPulse {
+  0% {
+    transform: scale(1);
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+  50% {
+    transform: scale(1.005);
+    background-color: rgba(59, 130, 246, 0.2);
+  }
+  100% {
+    transform: scale(1);
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+}
+
+@keyframes selectFade {
+  from {
+    background-color: transparent;
+  }
+  to {
+    @apply bg-blue-50;
+  }
+}
+
+@keyframes checkmarkAppear {
+  from {
+    opacity: 0;
+    transform: scale(0) rotate(-45deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes borderSlideIn {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.action-buttons {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding: 1rem;
+  box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1);
+  z-index: 10;
+  @apply rounded-t-lg;
+}
+
+.table-container {
+  @apply relative sm:rounded-lg;
+  overflow-y: auto;
+  max-height: calc(100vh - 400px); // Adjust this value based on your needs
+  
+  table {
+    @apply w-full text-base text-gray-900;
+    
+    thead {
+      @apply text-sm font-bold text-gray-900 uppercase bg-gray-50;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    
+    th {
+      @apply px-6 py-3;
+    }
+    
+    td {
+      @apply px-6 py-4 whitespace-nowrap font-medium;
+    }
+
+    tbody tr {
+      @apply border-b;
+    }
+  }
+}

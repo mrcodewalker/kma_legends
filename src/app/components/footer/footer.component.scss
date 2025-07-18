@@ -1,0 +1,57 @@
+footer {
+  position: relative;
+  box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.1);
+
+  .container {
+    position: relative;
+    z-index: 1;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(59, 130, 246, 0.5), transparent);
+  }
+
+  img.w-16 {
+    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  .text-blue-400 {
+    text-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+  }
+
+  .fas, .fab {
+    transition: transform 0.3s ease;
+  }
+
+  a:hover {
+    .fas, .fab {
+      transform: translateX(5px);
+    }
+  }
+
+  // Enhance social media icons
+  .fab {
+    &.fa-facebook-f:hover {
+      color: #1877f2;
+    }
+    &.fa-twitter:hover {
+      color: #1da1f2;
+    }
+    &.fa-github:hover {
+      color: #6e5494;
+    }
+  }
+}
+
+

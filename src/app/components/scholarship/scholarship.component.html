@@ -1,0 +1,219 @@
+<!-- Place celebration-canvas at the very top -->
+<app-celebration-canvas></app-celebration-canvas>
+
+<div class="h-full w-full transition-colors duration-200" [ngClass]="{'bg-gray-900': isDarkMode}">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-8 scholarship-container">
+    <div class="mb-4 sm:mb-8">
+      <!-- Header with shimmer effect -->
+      <div class="scholarship-header bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg p-4 sm:p-6 text-white mb-4 sm:mb-8">
+        <div class="flex justify-between items-center flex-wrap gap-4">
+          <div>
+            <h2 class="text-2xl sm:text-3xl font-bold">Danh sách học bổng dự kiến</h2>
+            <p class="text-indigo-100 text-base sm:text-lg mt-2 sm:mt-4">Xem và quản lý danh sách học bổng của sinh viên</p>
+          </div>
+          <button 
+            (click)="toggleFireworks()"
+            class="fireworks-toggle px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shrink-0"
+            [ngClass]="{
+              'bg-yellow-500 hover:bg-yellow-600 text-gray-900': !isFireworksEnabled,
+              'bg-red-500 hover:bg-red-600 text-white': isFireworksEnabled
+            }">
+            <div class="flex items-center space-x-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+              </svg>
+              <span>{{ isFireworksEnabled ? 'Tắt pháo hoa' : 'Bật pháo hoa' }}</span>
+            </div>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Filter and Export Section -->
+      <div class="rounded-lg shadow-lg transition-colors duration-200"
+           [ngClass]="{'bg-white': !isDarkMode, 'bg-gray-800': isDarkMode}">
+        <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 p-4 sm:p-6">
+          <div class="w-full sm:w-64">
+            <label for="courseSelect" class="block text-sm font-medium mb-2 transition-colors duration-200"
+                   [ngClass]="{'text-gray-700': !isDarkMode, 'text-gray-200': isDarkMode}">
+              <svg class="w-5 h-5 inline-block mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+              Chọn khóa:
+            </label>
+            <select
+              [formControl]="selectedCourse"
+              (change)="onCourseChange()"
+              id="courseSelect"
+              class="block w-full px-3 py-2 sm:px-4 sm:py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200"
+              [ngClass]="{
+                'bg-white text-gray-900 border-gray-300': !isDarkMode,
+                'bg-gray-700 text-white border-gray-600': isDarkMode
+              }">
+              <option value="">-- Chọn khóa --</option>
+              <option *ngFor="let course of availableCourses" [value]="course.value">
+                {{ course.viewValue }}
+              </option>
+            </select>
+          </div>
+          
+          <button 
+            (click)="exportToExcel()"
+            [disabled]="!scholarshipStudents.length"
+            class="export-button shrink-0 inline-flex items-center justify-center px-4 py-2 sm:px-6 sm:py-3 border border-transparent rounded-lg text-base font-medium text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Xuất Excel
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loading" class="text-center py-8 sm:py-12">
+        <div class="loading-spinner mx-auto mb-4"></div>
+        <p class="text-base sm:text-lg" [ngClass]="{'text-gray-600': !isDarkMode, 'text-gray-300': isDarkMode}">
+          Đang tải dữ liệu...
+        </p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error" class="bg-red-50 border-l-4 border-red-500 p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 sm:h-6 sm:w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm sm:text-base font-medium text-red-800">Đã xảy ra lỗi</h3>
+            <p class="mt-1 text-sm sm:text-base text-red-700">{{ error }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scholarship List -->
+      <div *ngIf="!loading && scholarshipStudents.length > 0" 
+           class="rounded-lg shadow-lg overflow-hidden transition-colors duration-200 mb-4"
+           [ngClass]="{'bg-white': !isDarkMode, 'bg-gray-800': isDarkMode}">
+        <div class="overflow-x-auto">
+          <div class="inline-block min-w-full align-middle">
+            <table class="min-w-full divide-y transition-colors duration-200"
+                   [ngClass]="{
+                     'divide-gray-200': !isDarkMode,
+                     'divide-gray-700': isDarkMode
+                   }">
+              <thead [ngClass]="{'bg-gray-50': !isDarkMode, 'bg-gray-900': isDarkMode}">
+                <tr>
+                  <th class="pl-6 pr-3 py-3 sm:px-6 sm:py-4 text-left text-xs sm:text-sm font-medium uppercase tracking-wider transition-colors duration-200"
+                      [ngClass]="{'text-gray-500': !isDarkMode, 'text-gray-400': isDarkMode}">
+                    Thứ hạng
+                  </th>
+                  <th class="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs sm:text-sm font-medium uppercase tracking-wider transition-colors duration-200"
+                      [ngClass]="{'text-gray-500': !isDarkMode, 'text-gray-400': isDarkMode}">
+                    Họ và tên
+                  </th>
+                  <th class="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs sm:text-sm font-medium uppercase tracking-wider transition-colors duration-200"
+                      [ngClass]="{'text-gray-500': !isDarkMode, 'text-gray-400': isDarkMode}">
+                    MSSV
+                  </th>
+                  <th class="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs sm:text-sm font-medium uppercase tracking-wider transition-colors duration-200"
+                      [ngClass]="{'text-gray-500': !isDarkMode, 'text-gray-400': isDarkMode}">
+                    Lớp
+                  </th>
+                  <th class="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs sm:text-sm font-medium uppercase tracking-wider transition-colors duration-200"
+                      [ngClass]="{'text-gray-500': !isDarkMode, 'text-gray-400': isDarkMode}">
+                    GPA (4.0)
+                  </th>
+                  <th class="px-3 py-3 sm:px-6 sm:py-4 text-left text-xs sm:text-sm font-medium uppercase tracking-wider transition-colors duration-200"
+                      [ngClass]="{'text-gray-500': !isDarkMode, 'text-gray-400': isDarkMode}">
+                    GPA (10.0)
+                  </th>
+                </tr>
+              </thead>
+              <tbody [ngClass]="{'divide-y divide-gray-200': !isDarkMode, 'divide-y divide-gray-700': isDarkMode}">
+                <tr *ngFor="let student of scholarshipStudents; let i = index" 
+                    class="scholarship-row transition-colors duration-150"
+                    [ngClass]="{
+                      'hover:bg-gray-50': !isDarkMode && student.ranking > 3,
+                      'hover:bg-gray-700': isDarkMode && student.ranking > 3,
+                      'bg-yellow-50 hover:bg-yellow-100': !isDarkMode && student.ranking <= 3,
+                      'bg-yellow-900/30 hover:bg-yellow-900/40': isDarkMode && student.ranking <= 3,
+                      'bg-blue-50 hover:bg-blue-100': !isDarkMode && student.ranking > 3 && student.ranking <= 10,
+                      'bg-blue-900/30 hover:bg-blue-900/40': isDarkMode && student.ranking > 3 && student.ranking <= 10
+                    }">
+                  <td class="pl-6 pr-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <!-- Medal for top 3 -->
+                      <div *ngIf="student.ranking <= 3" class="flex-shrink-0 mr-2">
+                        <span [class]="'medal ' + (student.ranking === 1 ? 'gold' : student.ranking === 2 ? 'silver' : 'bronze')">
+                          <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.616a1 1 0 01.894-1.79l1.599.8L9 4.323V3a1 1 0 011-1z" clip-rule="evenodd"/>
+                          </svg>
+                        </span>
+                      </div>
+                      <!-- Ranking number -->
+                      <span class="inline-flex items-center justify-center min-w-[2.5rem] px-2 py-1 sm:px-3 sm:py-1 text-xs sm:text-sm font-semibold rounded-full"
+                            [ngClass]="{
+                              'bg-yellow-100 text-yellow-800': !isDarkMode && student.ranking <= 3,
+                              'bg-yellow-900/50 text-yellow-100': isDarkMode && student.ranking <= 3,
+                              'bg-blue-100 text-blue-800': !isDarkMode && student.ranking > 3 && student.ranking <= 10,
+                              'bg-blue-900/50 text-blue-100': isDarkMode && student.ranking > 3 && student.ranking <= 10,
+                              'bg-gray-100 text-gray-800': !isDarkMode && student.ranking > 10,
+                              'bg-gray-700 text-gray-100': isDarkMode && student.ranking > 10
+                            }">
+                        {{ student.ranking }}
+                      </span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                    <div class="text-sm font-semibold transition-colors duration-200"
+                         [ngClass]="{'text-gray-900': !isDarkMode, 'text-gray-100': isDarkMode}">
+                      {{ student.studentName }}
+                    </div>
+                  </td>
+                  <td class="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium transition-colors duration-200"
+                      [ngClass]="{'text-gray-900': !isDarkMode, 'text-gray-100': isDarkMode}">
+                    {{ student.studentCode }}
+                  </td>
+                  <td class="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-sm transition-colors duration-200"
+                      [ngClass]="{'text-gray-500': !isDarkMode, 'text-gray-400': isDarkMode}">
+                    {{ student.studentClass }}
+                  </td>
+                  <td class="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap font-semibold text-sm transition-colors duration-200"
+                      [ngClass]="{'text-gray-900': !isDarkMode, 'text-gray-100': isDarkMode}">
+                    <span class="font-mono">{{ student.gpa.toFixed(2) }}</span>
+                  </td>
+                  <td class="px-3 py-3 sm:px-6 sm:py-4 whitespace-nowrap font-semibold text-sm transition-colors duration-200"
+                      [ngClass]="{'text-gray-900': !isDarkMode, 'text-gray-100': isDarkMode}">
+                    <span class="font-mono">{{ student.asiaGpa.toFixed(2) }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Data State -->
+      <div *ngIf="!loading && scholarshipStudents.length === 0 && selectedCourse.value" 
+           class="text-center py-8 sm:py-12 rounded-lg shadow-lg transition-colors duration-200"
+           [ngClass]="{'bg-white': !isDarkMode, 'bg-gray-800': isDarkMode}">
+        <svg class="mx-auto h-12 w-12 sm:h-16 sm:w-16 transition-colors duration-200"
+             [ngClass]="{'text-gray-400': !isDarkMode, 'text-gray-500': isDarkMode}"
+             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 12h.01M12 14h.01M12 16h.01M12 18h.01M12 20h.01M12 22h.01" />
+        </svg>
+        <h3 class="mt-4 text-base sm:text-lg font-medium transition-colors duration-200"
+            [ngClass]="{'text-gray-900': !isDarkMode, 'text-gray-100': isDarkMode}">
+          Không có dữ liệu
+        </h3>
+        <p class="mt-2 text-sm sm:text-base transition-colors duration-200"
+           [ngClass]="{'text-gray-500': !isDarkMode, 'text-gray-400': isDarkMode}">
+          Không có dữ liệu học bổng cho khóa đã chọn
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
