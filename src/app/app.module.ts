@@ -34,6 +34,9 @@ import { GradeConversionDialogComponent } from './components/scores/grade-conver
 import { AboutComponent } from './components/about/about.component';
 import { BuyMeCoffeeComponent } from './components/buy-me-coffee/buy-me-coffee.component';
 import { FeedbackComponent } from './components/feedback/feedback.component';
+import { ToastComponent } from './components/toast/toast.component';
+import { UnsavedChangesDialogComponent } from './components/scores/unsaved-changes-dialog/unsaved-changes-dialog.component';
+import { VirtualCPACalculatorDialogComponent } from './components/scores/virtual-cpa-calculator-dialog/virtual-cpa-calculator-dialog.component';
 
 @NgModule({
   declarations: [
@@ -52,7 +55,10 @@ import { FeedbackComponent } from './components/feedback/feedback.component';
     GradeConversionDialogComponent,
     AboutComponent,
     BuyMeCoffeeComponent,
-    FeedbackComponent
+    FeedbackComponent,
+    ToastComponent,
+    UnsavedChangesDialogComponent,
+    VirtualCPACalculatorDialogComponent
   ],
   imports: [
     BrowserModule,

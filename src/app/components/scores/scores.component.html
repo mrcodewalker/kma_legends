@@ -130,13 +130,6 @@
               <i class="fas fa-table"></i>
               <span class="hidden sm:inline">Thang điểm</span>
             </button>
-            <button
-              (click)="openCPACalculator()"
-              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2"
-            >
-              <i class="fas fa-calculator"></i>
-              <span class="hidden sm:inline">Tính CPA cần đạt</span>
-            </button>
           </div>
         </div>
 
@@ -161,12 +154,70 @@
         </div>
       </div>
 
+      <!-- Virtual Table Loading -->
+      <div *ngIf="showVirtualTable && isLoadingVirtualTable" class="bg-gradient-to-br from-white via-white to-purple-50 rounded-lg shadow-lg overflow-hidden">
+        <div class="p-6 text-center">
+          <div class="flex flex-col items-center justify-center py-16">
+            <div class="relative">
+              <div class="w-12 h-12 border-4 border-purple-200 rounded-full"></div>
+              <div class="absolute top-0 left-0 w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <div class="mt-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-2">Đang tải bảng điểm ảo</h3>
+              <p class="text-gray-600">Vui lòng chờ trong giây lát...</p>
+            </div>
+            <div class="mt-4 flex space-x-1">
+              <div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
+              <div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+              <div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Virtual Table Empty State -->
+      <div *ngIf="showVirtualTable && !isLoadingVirtualTable && !virtualTable" class="bg-gradient-to-br from-white via-white to-purple-50 rounded-lg shadow-lg overflow-hidden">
+        <div class="p-6 text-center">
+          <div class="flex flex-col items-center justify-center py-12">
+            <div class="bg-purple-100 rounded-full p-4 mb-4">
+              <i class="fas fa-table text-purple-600 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Chưa có bảng điểm ảo</h3>
+            <p class="text-gray-600 mb-4">Bạn chưa có bảng điểm ảo nào trên server. Hãy tạo bảng điểm ảo mới từ dữ liệu hiện tại.</p>
+            <button
+              (click)="createVirtualTable()"
+              class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2"
+            >
+              <i class="fas fa-plus"></i>
+              <span>Tạo bảng điểm ảo mới</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Virtual Table Section -->
-      <div *ngIf="showVirtualTable && virtualTable" class="bg-gradient-to-br from-white via-white to-purple-50 rounded-lg shadow-lg overflow-hidden">
+      <div *ngIf="showVirtualTable && virtualTable && !isLoadingVirtualTable" class="bg-gradient-to-br from-white via-white to-purple-50 rounded-lg shadow-lg overflow-hidden">
         <div class="p-6">
           <div class="flex flex-col gap-4">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <h2 class="text-2xl font-bold text-gray-800">Bảng điểm ảo</h2>
+              <div class="flex flex-col">
+                <h2 class="text-2xl font-bold text-gray-800">Bảng điểm ảo</h2>
+                <!-- Status indicators -->
+                <div class="flex items-center gap-4 text-sm mt-1">
+                  <div *ngIf="isSavingVirtualTable" class="flex items-center gap-2 text-blue-600">
+                    <div class="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <span>Đang lưu dữ liệu lên server...</span>
+                  </div>
+                  <div *ngIf="hasUnsavedChanges && !isSavingVirtualTable" class="flex items-center gap-2 text-orange-600">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Có thay đổi chưa được lưu lên server</span>
+                  </div>
+                  <div *ngIf="!hasUnsavedChanges && !isSavingVirtualTable && isDataLoadedFromServer" class="flex items-center gap-2 text-green-600">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Đã đồng bộ với server</span>
+                  </div>
+                </div>
+              </div>
               <div class="flex flex-wrap gap-2">
                 <button
                   (click)="selectAllSubjects()"
@@ -185,9 +236,26 @@
                 <button
                   (click)="resetVirtualTable()"
                   class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2"
+                  title="Khôi phục dữ liệu mới nhất từ tab điểm thường"
                 >
-                  <i class="fas fa-sync"></i>
+                  <i class="fas fa-undo"></i>
                   <span>Khôi phục</span>
+                </button>
+                <button
+                  (click)="openVirtualCPACalculator()"
+                  class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2"
+                >
+                  <i class="fas fa-calculator"></i>
+                  <span>CPA mục tiêu</span>
+                </button>
+                <button
+                  (click)="saveVirtualTableToServer()"
+                  [disabled]="isSavingVirtualTable || !hasUnsavedChanges"
+                  class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <i class="fas fa-cloud-upload-alt" *ngIf="!isSavingVirtualTable"></i>
+                  <div *ngIf="isSavingVirtualTable" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>{{isSavingVirtualTable ? 'Đang lưu...' : 'Lưu lên server'}}</span>
                 </button>
               </div>
             </div>
@@ -222,6 +290,7 @@
                 </div>
               </div>
             </div>
+
           </div>
         </div>
 
@@ -257,7 +326,7 @@
                   <input 
                     type="text" 
                     [(ngModel)]="score.subjectName"
-                    (blur)="saveVirtualTableToStorage()"
+                    (blur)="saveVirtualTableToStorage(); markAsChanged()"
                     class="w-full bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none"
                     placeholder="Nhập tên môn học..."
                   >
@@ -266,7 +335,7 @@
                   <input 
                     type="number" 
                     [(ngModel)]="score.subjectCredit"
-                    (blur)="saveVirtualTableToStorage()"
+                    (blur)="saveVirtualTableToStorage(); markAsChanged()"
                     class="w-20 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center"
                     min="0"
                     max="10"
@@ -278,7 +347,7 @@
                     <input 
                       type="number" 
                       [ngModel]="score.scoreFirst"
-                      (ngModelChange)="score.scoreFirst = parseFloat($event); calculateOverallScore(score); saveVirtualTableToStorage()"
+                      (ngModelChange)="score.scoreFirst = parseFloat($event); calculateOverallScore(score); saveVirtualTableToStorage(); markAsChanged()"
                       class="w-20 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center"
                       min="0"
                       max="10"
@@ -291,7 +360,7 @@
                     <input 
                       type="number" 
                       [ngModel]="score.scoreSecond"
-                      (ngModelChange)="score.scoreSecond = parseFloat($event); calculateOverallScore(score); saveVirtualTableToStorage()"
+                      (ngModelChange)="score.scoreSecond = parseFloat($event); calculateOverallScore(score); saveVirtualTableToStorage(); markAsChanged()"
                       class="w-20 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center"
                       min="0"
                       max="10"
@@ -304,7 +373,7 @@
                     <input 
                       type="number" 
                       [ngModel]="score.scoreFinal"
-                      (ngModelChange)="score.scoreFinal = parseFloat($event); calculateOverallScore(score); saveVirtualTableToStorage()"
+                      (ngModelChange)="score.scoreFinal = parseFloat($event); calculateOverallScore(score); saveVirtualTableToStorage(); markAsChanged()"
                       class="w-20 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center"
                       min="0"
                       max="10"
