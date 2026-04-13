@@ -379,32 +379,49 @@ export class ScoresComponent implements OnInit {
   }
 
   resetVirtualTable() {
-    if (!this.scoreData) return;
+    if (!this.loggedInStudentCode) return;
 
-    // Ưu tiên khôi phục từ snapshot của lần tra cứu gần nhất
-    const snapshot = localStorage.getItem(this.VIRTUAL_SCORES_SNAPSHOT_KEY);
-    if (snapshot) {
-      try {
-        const parsed = JSON.parse(snapshot) as VirtualScoreTable;
+    this.toastService.info('Đang lấy dữ liệu từ server...', 2000);
+
+    this.scoresService.restoreScores(this.loggedInStudentCode).subscribe({
+      next: (response: any) => {
+        // Response giống ListScoreResponse: { studentDTO, scoreDTOS }
+        const scoreDTOS = response?.scoreDTOS ?? response?.listScoreDTO?.scoreDTOS ?? [];
+        const studentDTO = response?.studentDTO ?? response?.listScoreDTO?.studentDTO;
+
+        if (!scoreDTOS.length) {
+          this.toastService.error('Không có dữ liệu để khôi phục', 3000);
+          return;
+        }
+
         this.virtualTable = {
-          ...parsed,
-          lastUpdated: new Date() // cập nhật thời điểm khôi phục
+          studentInfo: {
+            studentCode: studentDTO?.studentCode ?? this.loggedInStudentCode!,
+            studentName: studentDTO?.studentName ?? '',
+            studentClass: studentDTO?.studentClass ?? ''
+          },
+          scores: scoreDTOS.map((s: any) => ({
+            scoreText: s.scoreText ?? '',
+            scoreFirst: Number(s.scoreFirst) || 0,
+            scoreSecond: Number(s.scoreSecond) || 0,
+            scoreFinal: Number(s.scoreFinal) || 0,
+            scoreOverall: Number(s.scoreOverall) || 0,
+            subjectName: s.subjectName ?? '',
+            subjectCredit: Number(s.subjectCredit) || 0,
+            isSelected: true
+          })),
+          lastUpdated: new Date()
         };
-        this.calculateVirtualGPA();
-        // Khôi phục từ snapshot là thao tác người dùng → coi như có thay đổi cần lưu
-        this.markAsChanged();
-        this.toastService.success('Đã khôi phục từ lần tra cứu gần nhất', 3000);
-        return;
-      } catch (e) {
-        console.error('Error parsing snapshot for restore:', e);
-      }
-    }
 
-    // Nếu không có snapshot thì tạo mới từ scoreData hiện tại
-    this.virtualTable = this.buildVirtualTableFromScoreData();
-    this.calculateVirtualGPA();
-    this.markAsChanged();
-    this.toastService.info('Đã tạo bảng điểm ảo mới từ dữ liệu hiện tại', 3000);
+        this.calculateVirtualGPA();
+        this.markAsChanged();
+        this.toastService.success('Đã khôi phục dữ liệu từ server', 3000);
+      },
+      error: (err: any) => {
+        console.error('Error restoring scores:', err);
+        this.toastService.error('Không thể lấy dữ liệu khôi phục từ server', 4000);
+      }
+    });
   }
 
   clearVirtualTable() {

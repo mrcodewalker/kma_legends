@@ -41,8 +41,8 @@ export class ScoresService {
     return this.http.post<any>(this.VIRTUAL_SCORES_GET_ENCRYPTED_URL, { studentCode });
   }
 
-  /** GET /api/v1/score-batch/student/{studentCode} — plain (fallback) */
-  getVirtualScores(studentCode: string): Observable<any> {
-    return this.http.get<any>(`${this.VIRTUAL_SCORES_GET_URL}/${studentCode}`);
+  /** POST /api/v1/scores/restore — lấy điểm không mask để restore bảng ảo, encrypted by interceptor */
+  restoreScores(studentCode: string): Observable<ListScoreResponse> {
+    return this.http.post<ListScoreResponse>(`${environment.apiLocalUrl}/scores/restore`, { studentCode });
   }
 }
