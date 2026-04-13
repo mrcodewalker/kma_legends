@@ -14,6 +14,8 @@
       <nav class="hidden md:flex space-x-8">
         <a [routerLink]="['/']" routerLinkActive="!text-blue-400" [routerLinkActiveOptions]="{exact: true}"
            class="text-gray-300 hover:text-blue-400 font-bold transition-colors duration-200">Trang chủ</a>
+        <a [routerLink]="['/qa']" routerLinkActive="!text-blue-400"
+           class="text-gray-300 hover:text-blue-400 font-bold transition-colors duration-200">Q&A</a>
         <a [routerLink]="['/schedule']" routerLinkActive="!text-blue-400"
            class="text-gray-300 hover:text-blue-400 font-bold transition-colors duration-200">Lịch học</a>
         <a [routerLink]="['/scores']" routerLinkActive="!text-blue-400"
@@ -87,6 +89,8 @@
     <div class="px-2 pt-2 pb-3 space-y-1">
       <a [routerLink]="['/']" routerLinkActive="!bg-blue-800 !text-blue-400" [routerLinkActiveOptions]="{exact: true}"
          (click)="closeMobileMenu()" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-blue-800 hover:text-blue-400">Trang chủ</a>
+      <a [routerLink]="['/qa']" routerLinkActive="!bg-blue-800 !text-blue-400" (click)="closeMobileMenu()"
+         class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-blue-800 hover:text-blue-400">Q&A</a>
       <a [routerLink]="['/schedule']" routerLinkActive="!bg-blue-800 !text-blue-400" (click)="closeMobileMenu()"
          class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-blue-800 hover:text-blue-400">Lịch học</a>
       <a [routerLink]="['/scores']" routerLinkActive="!bg-blue-800 !text-blue-400" (click)="closeMobileMenu()"

@@ -16,11 +16,15 @@ export class EncryptionInterceptor implements HttpInterceptor {
   constructor(
     private encryptionService: EncryptionService,
     private publicKeyService: PublicKeyService
-  ) {}
+  ) { }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (!this.shouldEncrypt(request)) {
-      return next.handle(request);
+      // Strip internal header trước khi gửi đi server
+      const cleanRequest = request.headers.has('X-Skip-Encryption')
+        ? request.clone({ headers: request.headers.delete('X-Skip-Encryption') })
+        : request;
+      return next.handle(cleanRequest);
     }
 
     return from(this.encryptData(request.body)).pipe(
@@ -47,7 +51,8 @@ export class EncryptionInterceptor implements HttpInterceptor {
   private shouldEncrypt(request: HttpRequest<any>): boolean {
     return request.method === 'POST' &&
       request.body &&
-      !request.url.includes('/api/v1/encryption/public-key');
+      !request.url.includes('/api/v1/encryption/public-key') &&
+      !request.headers.has('X-Skip-Encryption');
   }
 
   private async encryptData(data: any): Promise<any> {

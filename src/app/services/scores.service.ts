@@ -1,30 +1,48 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ListScoreResponse, VirtualScoreTable } from '../models/scores.model';
+import { ListScoreResponse, VirtualScoreTable, ScoreBatchRequest } from '../models/scores.model';
 import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ScoresService {
-  private readonly FETCH_SCORES_URL = `${environment.apiLocalUrl}/ranking/scores`;
+  private readonly SCORES_URL = `${environment.apiLocalUrl}/scores/users`;
   private readonly VIRTUAL_SCORES_SAVE_URL = `${environment.apiLocalUrl}/score-batch/create-or-update`;
   private readonly VIRTUAL_SCORES_GET_URL = `${environment.apiLocalUrl}/score-batch/student`;
+  private readonly VIRTUAL_SCORES_GET_ENCRYPTED_URL = `${environment.apiLocalUrl}/score-batch/get-by-encrypted`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  fetchScores(credentials: { studentCode: string }): Observable<any> {
-    return this.http.post(this.FETCH_SCORES_URL, credentials);
+  /** GET /api/v1/scores/users/{studentCode} — plain, response masked */
+  fetchScores(studentCode: string): Observable<ListScoreResponse> {
+    return this.http.get<ListScoreResponse>(`${this.SCORES_URL}/${studentCode}`);
   }
 
+  /** POST /api/v1/score-batch/create-or-update — body encrypted by interceptor */
   saveVirtualScores(virtualTable: VirtualScoreTable): Observable<any> {
-    return this.http.post(this.VIRTUAL_SCORES_SAVE_URL, virtualTable);
+    const payload: ScoreBatchRequest = {
+      studentInfo: {
+        studentCode: virtualTable.studentInfo.studentCode,
+        studentName: virtualTable.studentInfo.studentName,
+        studentClass: virtualTable.studentInfo.studentClass
+      },
+      scores: virtualTable.scores,
+      lastUpdated: virtualTable.lastUpdated instanceof Date
+        ? virtualTable.lastUpdated.toISOString()
+        : new Date().toISOString()
+    };
+    return this.http.post(this.VIRTUAL_SCORES_SAVE_URL, payload);
   }
 
+  /** POST /api/v1/score-batch/student/encrypted — interceptor tự encrypt body */
+  getVirtualScoresEncrypted(studentCode: string): Observable<any> {
+    return this.http.post<any>(this.VIRTUAL_SCORES_GET_ENCRYPTED_URL, { studentCode });
+  }
+
+  /** GET /api/v1/score-batch/student/{studentCode} — plain (fallback) */
   getVirtualScores(studentCode: string): Observable<any> {
-    // Server có thể trả về cấu trúc khác với VirtualScoreTable (ví dụ: scoreItems,...)
-    // Vì vậy để linh hoạt, ta để any và chuẩn hóa ở component.
     return this.http.get<any>(`${this.VIRTUAL_SCORES_GET_URL}/${studentCode}`);
   }
 }

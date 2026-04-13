@@ -10,6 +10,7 @@ import { LoginVirtualCalendarComponent } from './components/login-virtual-calend
 import { AboutComponent } from './components/about/about.component';
 import { BuyMeCoffeeComponent } from './components/buy-me-coffee/buy-me-coffee.component';
 import { FeedbackComponent } from './components/feedback/feedback.component';
+import { QaComponent } from './components/qa/qa.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -22,6 +23,7 @@ const routes: Routes = [
   { path: 'about', component: AboutComponent },
   { path: 'buy-me-coffee', component: BuyMeCoffeeComponent },
   { path: 'feedback', component: FeedbackComponent },
+  { path: 'qa', component: QaComponent },
   { path: '**', redirectTo: '' }
 ];
 

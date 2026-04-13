@@ -37,6 +37,8 @@ import { FeedbackComponent } from './components/feedback/feedback.component';
 import { ToastComponent } from './components/toast/toast.component';
 import { UnsavedChangesDialogComponent } from './components/scores/unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { VirtualCPACalculatorDialogComponent } from './components/scores/virtual-cpa-calculator-dialog/virtual-cpa-calculator-dialog.component';
+import { ImportScoresDialogComponent } from './components/scores/import-scores-dialog/import-scores-dialog.component';
+import { QaComponent } from './components/qa/qa.component';
 
 @NgModule({
   declarations: [
@@ -58,7 +60,9 @@ import { VirtualCPACalculatorDialogComponent } from './components/scores/virtual
     FeedbackComponent,
     ToastComponent,
     UnsavedChangesDialogComponent,
-    VirtualCPACalculatorDialogComponent
+    VirtualCPACalculatorDialogComponent,
+    ImportScoresDialogComponent,
+    QaComponent
   ],
   imports: [
     BrowserModule,

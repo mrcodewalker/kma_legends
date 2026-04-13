@@ -4,9 +4,10 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ScoresService } from '../../services/scores.service';
 import { ToastService } from '../../services/toast.service';
-import { 
-  ListScoreResponse, 
-  ScoreDTO, 
+import {
+  ListScoreResponse,
+  ScoreDTO,
+  StudentInfo,
   GRADE_CONVERSION,
   GradeConversion,
   VirtualScore,
@@ -20,6 +21,7 @@ import { GradeConversionDialogComponent } from './grade-conversion-dialog/grade-
 import { UnsavedChangesDialogComponent, UnsavedChangesDialogData } from './unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../shared/confirm-dialog/confirm-dialog.component';
 import { VirtualCPACalculatorDialogComponent, VirtualCPACalculatorData } from './virtual-cpa-calculator-dialog/virtual-cpa-calculator-dialog.component';
+import { ImportScoresDialogComponent, ImportScoresDialogData } from './import-scores-dialog/import-scores-dialog.component';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
@@ -46,7 +48,8 @@ export class ScoresComponent implements OnInit {
   private readonly VIRTUAL_SCORES_KEY = 'virtualScoresTable';
   private readonly VIRTUAL_SCORES_SNAPSHOT_KEY = 'virtualScoresSnapshot';
   loggedInStudentCode: string | null = null;
-  
+  studentInfo: StudentInfo | null = null;
+
   scoreData: ListScoreResponse | null = null;
   virtualTable: VirtualScoreTable | null = null;
   gradeConversion = GRADE_CONVERSION;
@@ -55,6 +58,7 @@ export class ScoresComponent implements OnInit {
   currentSemesterGPA: number = 0;
   overallCPA: number = 0;
   virtualGPA: number = 0;
+  totalAccumulatedCredits: number = 0;
   isLoading = false;
   errorMessage: string | null = null;
   editingCell: { rowIndex: number; column: string } | null = null;
@@ -64,7 +68,7 @@ export class ScoresComponent implements OnInit {
   isLoadingVirtualTable = false;
   hasUnsavedChanges = false;
   isDataLoadedFromServer = false;
-  
+
   // CPA Calculator for Virtual Table
   virtualTableTotalCredits: number = 0; // Tổng số tín chỉ cuối khóa
   virtualTableCompletedCredits: number = 0; // Số tín chỉ đã hoàn thành từ bảng ảo
@@ -73,11 +77,11 @@ export class ScoresComponent implements OnInit {
   targetCPA: number = 0; // CPA mục tiêu
   requiredGPA: number = 0; // GPA cần đạt cho các môn còn lại
   remainingCredits: number = 0; // Số tín chỉ còn lại
-  
+
   scoreForm = new FormGroup({
     studentCode: new FormControl('', [Validators.required, Validators.minLength(3)])
   });
-  
+
   virtualTableCreditsForm = new FormGroup({
     totalCredits: new FormControl('', [Validators.required, Validators.min(1)]),
     targetCPA: new FormControl('', [Validators.min(0), Validators.max(4)])
@@ -102,7 +106,7 @@ export class ScoresComponent implements OnInit {
     private dialog: MatDialog,
     private router: Router,
     private toastService: ToastService
-  ) {}
+  ) { }
 
   ngOnInit() {
     // Không load từ localStorage nữa, chỉ load từ server khi cần
@@ -194,15 +198,15 @@ export class ScoresComponent implements OnInit {
       dialogRef.afterClosed().subscribe(result => {
         if (result) {
           // Người dùng chọn "Đến trang đăng nhập"
-          this.router.navigate(['/login'], { 
-            queryParams: { 
+          this.router.navigate(['/login'], {
+            queryParams: {
               returnUrl: '/scores',
               message: 'Vui lòng đăng nhập để sử dụng tính năng bảng điểm ảo'
             }
           });
         }
       });
-    } else if (this.scoreData && this.scoreData.listScoreDTO.studentDTO.studentCode !== this.loggedInStudentCode) {
+    } else if (this.scoreData && this.scoreData.studentDTO.studentCode !== this.loggedInStudentCode) {
       // Nếu đã đăng nhập nhưng đang xem điểm của người khác, hiển thị popup thông báo
       const dialogData: ConfirmDialogData = {
         title: 'Không thể sử dụng bảng điểm ảo',
@@ -229,13 +233,13 @@ export class ScoresComponent implements OnInit {
   }
 
   isVirtualTableEnabled(): boolean {
-    return !!this.scoreData && !!this.loggedInStudentCode && 
-           this.scoreData.listScoreDTO.studentDTO.studentCode === this.loggedInStudentCode;
+    return !!this.scoreData && !!this.loggedInStudentCode &&
+      this.scoreData.studentDTO.studentCode === this.loggedInStudentCode;
   }
 
   isLoggedInOrCorrectStudent(): boolean {
     if (!this.scoreData || !this.loggedInStudentCode) return false;
-    return this.scoreData.listScoreDTO.studentDTO.studentCode === this.loggedInStudentCode;
+    return this.scoreData.studentDTO.studentCode === this.loggedInStudentCode;
   }
 
   loadVirtualTableFromStorage() {
@@ -299,45 +303,42 @@ export class ScoresComponent implements OnInit {
     this.errorMessage = null;
 
     try {
-      const serverRaw: any = await this.scoresService.getVirtualScores(this.loggedInStudentCode).toPromise();
+      const serverRaw: any = await this.scoresService.getVirtualScoresEncrypted(this.loggedInStudentCode).toPromise();
 
-      // Chuẩn hóa dữ liệu trả về từ server theo định dạng VirtualScoreTable
-      // Hỗ trợ cả 2 dạng: { scores: [...] } hoặc { scoreItems: [...] }
-      const serverScores = serverRaw?.scores ?? serverRaw?.scoreItems;
+      // Response: { student_info: {...}, score_batch: { scoreItems: [...], ... } }
+      if (serverRaw?.student_info) {
+        this.studentInfo = serverRaw.student_info;
+      }
+
+      const batch = serverRaw?.score_batch;
+      const serverScores = batch?.scoreItems;
 
       if (Array.isArray(serverScores) && serverScores.length > 0) {
         const normalizedScores = serverScores.map((item: any) => ({
-          scoreText: item.scoreText,
+          scoreText: item.scoreText ?? '',
           scoreFirst: Number(item.scoreFirst) || 0,
           scoreSecond: Number(item.scoreSecond) || 0,
           scoreFinal: Number(item.scoreFinal) || 0,
           scoreOverall: Number(item.scoreOverall) || 0,
-          subjectName: item.subjectName,
+          subjectName: item.subjectName ?? '',
           subjectCredit: Number(item.subjectCredit) || 0,
           isSelected: Boolean(item.isSelected)
         }));
 
-        // Ưu tiên dùng studentDTO đã có đầy đủ trường từ lần tra cứu điểm gần nhất
-        const fallbackStudentInfo = this.scoreData?.listScoreDTO?.studentDTO ?? null;
-        const studentInfo = fallbackStudentInfo ?? {
-          studentId: Number(serverRaw?.studentId) || 0,
-          studentCode: serverRaw?.studentCode ?? this.loggedInStudentCode,
-          studentName: serverRaw?.studentName ?? '',
-          studentClass: serverRaw?.studentClass ?? ''
-        };
-
         this.virtualTable = {
-          studentInfo,
+          studentInfo: {
+            studentCode: batch?.studentCode ?? this.loggedInStudentCode,
+            studentName: batch?.studentName ?? '',
+            studentClass: batch?.studentClass ?? ''
+          },
           scores: normalizedScores,
-          lastUpdated: new Date(serverRaw?.lastUpdated ?? Date.now())
+          lastUpdated: new Date(batch?.lastUpdated ?? Date.now())
         };
 
         this.calculateVirtualGPA();
         this.isDataLoadedFromServer = true;
-        this.markAsSaved(); // Server là nguồn sự thật → không coi là thay đổi
-        console.log('Virtual table loaded from server (normalized):', this.virtualTable);
+        this.markAsSaved();
       } else {
-        // Không có dữ liệu trên server, đảm bảo không rơi vào dữ liệu local cũ
         this.virtualTable = null;
         this.isDataLoadedFromServer = false;
       }
@@ -361,8 +362,8 @@ export class ScoresComponent implements OnInit {
 
   private buildVirtualTableFromScoreData(): VirtualScoreTable {
     const virtualTable: VirtualScoreTable = {
-      studentInfo: { ...(this.scoreData as ListScoreResponse).listScoreDTO.studentDTO },
-      scores: (this.scoreData as ListScoreResponse).listScoreDTO.scoreDTOS.map(score => ({
+      studentInfo: { ...(this.scoreData as ListScoreResponse).studentDTO },
+      scores: (this.scoreData as ListScoreResponse).scoreDTOS.map(score => ({
         scoreText: score.scoreText,
         scoreFirst: score.scoreFirst,
         scoreSecond: score.scoreSecond,
@@ -414,12 +415,12 @@ export class ScoresComponent implements OnInit {
 
   selectAllSubjects() {
     if (!this.virtualTable) return;
-    
+
     const allSelected = this.virtualTable.scores.every(score => score.isSelected);
     this.virtualTable.scores.forEach(score => {
       score.isSelected = !allSelected;
     });
-    
+
     this.saveVirtualTableToStorage();
     this.markAsChanged();
     this.calculateVirtualGPA();
@@ -447,7 +448,7 @@ export class ScoresComponent implements OnInit {
     this.virtualTable.scores.push(newScore);
     this.saveVirtualTableToStorage();
     this.markAsChanged();
-    
+
     // Đợi DOM cập nhật và scroll đến môn học mới
     setTimeout(() => {
       const virtualTableContainer = document.querySelector('.virtual-table-container');
@@ -482,7 +483,7 @@ export class ScoresComponent implements OnInit {
 
   finishEditing(event: any, rowIndex: number, column: string) {
     if (!this.virtualTable) return;
-    
+
     const value = Number(event.target.value);
     const score = this.virtualTable.scores[rowIndex];
 
@@ -515,26 +516,26 @@ export class ScoresComponent implements OnInit {
 
   calculateOverallScore(score: VirtualScore) {
     if (!score) return;
-    
+
     const tp1 = typeof score.scoreFirst === 'number' ? score.scoreFirst : 0;  // Điểm GK
     const tp2 = typeof score.scoreSecond === 'number' ? score.scoreSecond : 0;  // Điểm Chuyên Cần
     const scoreFinal = typeof score.scoreFinal === 'number' ? score.scoreFinal : 0;  // Điểm CK
-    
+
     // Calculate overall score using the formula: (TP1*0.7 + 0.3*TP2)*0.3 + CK*0.7
     const processComponent = (tp1 * 0.7 + tp2 * 0.3) * 0.3;
     const finalComponent = scoreFinal * 0.7;
     // Round to 1 decimal place
     score.scoreOverall = Math.round((processComponent + finalComponent) * 10) / 10;
-    
+
     this.calculateVirtualGPA();
   }
 
   shouldIncludeInGPA(subjectName: string): boolean {
     const lowerName = subjectName.toLowerCase();
-    return !lowerName.includes('giáo dục thể chất') && 
-           !lowerName.includes('thực hành vật lý') &&
-           !lowerName.includes('gdtc') &&
-           !lowerName.includes('physical education');
+    return !lowerName.includes('giáo dục thể chất') &&
+      !lowerName.includes('thực hành vật lý') &&
+      !lowerName.includes('gdtc') &&
+      !lowerName.includes('physical education');
   }
 
   calculateVirtualGPA() {
@@ -542,21 +543,28 @@ export class ScoresComponent implements OnInit {
 
     let totalCredits = 0;
     let totalPoints = 0;
+    let accumulatedCredits = 0;
 
     this.virtualTable.scores.forEach(score => {
-      if (score.isSelected && this.shouldIncludeInGPA(score.subjectName)) {
-        const grade4 = this.convertTo4Scale(score.scoreOverall);
-        totalCredits += score.subjectCredit;
-        totalPoints += grade4 * score.subjectCredit;
+      if (score.isSelected) {
+        // Tổng tín chỉ tích lũy: tất cả môn được chọn, kể cả thể chất
+        accumulatedCredits += score.subjectCredit;
+
+        // GPA chỉ tính môn không phải thể chất
+        if (this.shouldIncludeInGPA(score.subjectName)) {
+          const grade4 = this.convertTo4Scale(score.scoreOverall);
+          totalCredits += score.subjectCredit;
+          totalPoints += grade4 * score.subjectCredit;
+        }
       }
     });
 
     this.virtualGPA = totalCredits > 0 ? totalPoints / totalCredits : 0;
-    
-    // Tính toán thêm cho CPA calculator
+    this.totalAccumulatedCredits = accumulatedCredits;
+
     this.calculateVirtualTableStats();
   }
-  
+
   calculateVirtualTableStats() {
     if (!this.virtualTable) {
       this.virtualTableCompletedCredits = 0;
@@ -574,7 +582,7 @@ export class ScoresComponent implements OnInit {
     this.virtualTable.scores.forEach(score => {
       if (score.isSelected && this.shouldIncludeInGPA(score.subjectName)) {
         const isFailed = this.isFailedSubject(score.scoreFinal, score.scoreOverall);
-        
+
         if (isFailed) {
           failedSubjects++;
         } else {
@@ -589,11 +597,11 @@ export class ScoresComponent implements OnInit {
 
     this.virtualTableCompletedCredits = completedCredits;
     this.virtualTableFailedSubjects = failedSubjects;
-    
+
     // CPA dự kiến từ bảng điểm ảo (chỉ tính các môn đã chọn và đạt)
     this.virtualTableCPA = totalCredits > 0 ? totalPoints / totalCredits : 0;
   }
-  
+
   onTotalCreditsChange() {
     const totalCredits = this.virtualTableCreditsForm.get('totalCredits')?.value;
     const creditsNumber = Number(totalCredits);
@@ -603,7 +611,7 @@ export class ScoresComponent implements OnInit {
       this.calculateRequiredGPA();
     }
   }
-  
+
   onTargetCPAChange() {
     const targetCPA = this.virtualTableCreditsForm.get('targetCPA')?.value;
     const targetCPANumber = Number(targetCPA);
@@ -612,32 +620,32 @@ export class ScoresComponent implements OnInit {
       this.calculateRequiredGPA();
     }
   }
-  
+
   calculateRequiredGPA() {
     if (!this.virtualTableTotalCredits || !this.targetCPA || this.virtualTableTotalCredits <= 0) {
       this.requiredGPA = 0;
       this.remainingCredits = 0;
       return;
     }
-    
+
     // Số tín chỉ còn lại = Tổng số tín chỉ - Số tín chỉ đã hoàn thành từ bảng ảo
     this.remainingCredits = this.virtualTableTotalCredits - this.virtualTableCompletedCredits;
-    
+
     if (this.remainingCredits <= 0) {
       this.requiredGPA = 0;
       return;
     }
-    
+
     // Công thức: targetCPA * totalCredits = currentCPA * completedCredits + requiredGPA * remainingCredits
     // => requiredGPA = (targetCPA * totalCredits - currentCPA * completedCredits) / remainingCredits
     const currentPoints = this.virtualTableCPA * this.virtualTableCompletedCredits;
     const targetPoints = this.targetCPA * this.virtualTableTotalCredits;
     this.requiredGPA = (targetPoints - currentPoints) / this.remainingCredits;
-    
+
     // Giới hạn trong khoảng 0-4
     this.requiredGPA = Math.max(0, Math.min(4, this.requiredGPA));
   }
-  
+
   isTargetCPAPossible(): boolean {
     return this.requiredGPA >= 0 && this.requiredGPA <= 4 && this.remainingCredits > 0;
   }
@@ -693,18 +701,25 @@ export class ScoresComponent implements OnInit {
     this.errorMessage = null;
     const studentCode = this.scoreForm.get('studentCode')?.value;
 
-    this.scoresService.fetchScores({ studentCode: studentCode || '' }).subscribe({
+    this.scoresService.fetchScores(studentCode || '').subscribe({
       next: (response: any) => {
+        this.isLoading = false;
+
+        // Kiểm tra nếu response không có dữ liệu hoặc null (API mới: { studentDTO, scoreDTOS })
+        if (!response || !response.studentDTO) {
+          console.log('Response missing data, showing new student dialog');
+          this.showNewStudentDialog();
+          return;
+        }
+
         this.scoreData = response;
         this.calculateGPAs();
-        this.isLoading = false;
+
         // Add to search history after successful load
-        if (this.scoreData?.listScoreDTO?.studentDTO) {
-          this.addToSearchHistory(
-            this.scoreData.listScoreDTO.studentDTO.studentCode,
-            this.scoreData.listScoreDTO.studentDTO.studentName
-          );
-        }
+        this.addToSearchHistory(
+          this.scoreData!.studentDTO.studentCode,
+          this.scoreData!.studentDTO.studentName
+        );
 
         // Save a snapshot for virtual table restore
         try {
@@ -716,8 +731,35 @@ export class ScoresComponent implements OnInit {
       },
       error: (error: any) => {
         console.error('Error loading scores:', error);
-        this.errorMessage = 'Không thể tải điểm. Vui lòng kiểm tra mã sinh viên và thử lại.';
         this.isLoading = false;
+        if (error?.status === 404) {
+          this.showNewStudentDialog();
+        } else {
+          this.errorMessage = error?.error?.message || 'Không thể tải bảng điểm. Vui lòng thử lại.';
+        }
+      }
+    });
+  }
+
+  private showNewStudentDialog() {
+    const dialogData: ConfirmDialogData = {
+      title: 'Bạn là KMAer mới?',
+      message: 'Để đồng bộ hóa thông tin sinh viên của bạn hãy đăng nhập vào chức năng Lịch học và quay lại đây tra điểm nhé.',
+      status: 'info',
+      confirmText: 'Tới lịch học',
+      cancelText: 'Hủy'
+    };
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '500px',
+      data: dialogData,
+      panelClass: 'new-student-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Người dùng chọn "Tới lịch học"
+        this.router.navigate(['/schedule']);
       }
     });
   }
@@ -728,7 +770,7 @@ export class ScoresComponent implements OnInit {
     let completedCredits = 0;
     let failedSubjects = 0;
 
-    this.scoreData.listScoreDTO.scoreDTOS.forEach(score => {
+    this.scoreData.scoreDTOS.forEach(score => {
       if (this.shouldIncludeInGPA(score.subjectName)) {
         if (!this.isFailedSubject(score.scoreFinal, score.scoreOverall)) {
           completedCredits += score.subjectCredit;
@@ -750,21 +792,13 @@ export class ScoresComponent implements OnInit {
     let totalCredits = 0;
     let totalPoints = 0;
 
-    // Get current semester subjects names
-    const currentSemesterSubjectNames = new Set(
-      this.scoreData.subjectDTOS.map(subject => subject.subjectName.trim().toLowerCase())
-    );
-
-    this.scoreData.listScoreDTO.scoreDTOS.forEach(score => {
+    // API mới không có subjectDTOS — currentSemester không còn được phân biệt từ server
+    // Tính CPA tổng từ tất cả môn học
+    this.scoreData.scoreDTOS.forEach(score => {
       if (!this.shouldIncludeInGPA(score.subjectName)) return;
 
       const grade4 = this.convertTo4Scale(score.scoreOverall);
       const credits = score.subjectCredit;
-
-      if (currentSemesterSubjectNames.has(score.subjectName.trim().toLowerCase())) {
-        currentSemesterCredits += credits;
-        currentSemesterPoints += grade4 * credits;
-      }
 
       if (!this.isFailedSubject(score.scoreFinal, score.scoreOverall)) {
         totalCredits += credits;
@@ -772,12 +806,10 @@ export class ScoresComponent implements OnInit {
       }
     });
 
-    this.currentSemesterGPA = currentSemesterCredits > 0 
-      ? currentSemesterPoints / currentSemesterCredits 
-      : 0;
-    
-    this.overallCPA = totalCredits > 0 
-      ? totalPoints / totalCredits 
+    this.currentSemesterGPA = 0; // Không còn phân biệt kỳ hiện tại từ API mới
+
+    this.overallCPA = totalCredits > 0
+      ? totalPoints / totalCredits
       : 0;
 
     this.calculateStats();
@@ -815,9 +847,9 @@ export class ScoresComponent implements OnInit {
 
   getGradeClass(score: number): string {
     if (typeof score !== 'number' || isNaN(score)) return '';
-    
+
     const baseClasses = 'font-medium ';
-    
+
     if (score >= 9.0) return baseClasses + 'text-green-600';
     if (score >= 8.5) return baseClasses + 'text-green-500';
     if (score >= 7.8) return baseClasses + 'text-blue-600';
@@ -830,10 +862,8 @@ export class ScoresComponent implements OnInit {
   }
 
   isCurrentSemesterSubject(subjectName: string): boolean {
-    if (!this.scoreData) return false;
-    return this.scoreData.subjectDTOS.some(
-      subject => subject.subjectName.trim().toLowerCase() === subjectName.trim().toLowerCase()
-    );
+    // API mới không trả về subjectDTOS, luôn trả về false
+    return false;
   }
 
   toggleGradeTable() {
@@ -851,13 +881,13 @@ export class ScoresComponent implements OnInit {
       this.handleVirtualTableAccess();
       return;
     }
-    
+
     // Nếu đang đóng bảng ảo và có thay đổi chưa lưu, hiện dialog
     if (this.showVirtualTable && this.hasUnsavedChanges) {
       this.showUnsavedChangesDialog();
       return;
     }
-    
+
     this.showVirtualTable = !this.showVirtualTable;
     if (this.showVirtualTable) {
       // Reset trạng thái trước khi tải
@@ -865,11 +895,11 @@ export class ScoresComponent implements OnInit {
       this.hasUnsavedChanges = false;
       this.isDataLoadedFromServer = false;
       // Dọn dẹp bản local cũ để tránh nhầm lẫn (không dùng khi mở bảng ảo)
-      try { localStorage.removeItem(this.VIRTUAL_SCORES_KEY); } catch {}
-      
+      try { localStorage.removeItem(this.VIRTUAL_SCORES_KEY); } catch { }
+
       // Luôn gọi API từ server khi vào bảng ảo
       await this.loadVirtualTableFromServer();
-      
+
       // Nếu không có dữ liệu từ server và có scoreData, tạo mới nhưng KHÔNG coi là thay đổi
       if (!this.virtualTable && this.scoreData) {
         this.createVirtualTable();
@@ -901,13 +931,13 @@ export class ScoresComponent implements OnInit {
 
   getScoreClass(score: number, isFinal: boolean = false, scoreOverall: number = 0): string {
     if (typeof score !== 'number' || isNaN(score)) return '';
-    
+
     const baseClasses = 'font-medium ';
-    
+
     if (isFinal && this.isFailedSubject(score, scoreOverall)) {
       return baseClasses + 'text-red-500';
     }
-    
+
     if (score >= 9.0) return baseClasses + 'text-green-600';
     if (score >= 8.5) return baseClasses + 'text-green-500';
     if (score >= 7.8) return baseClasses + 'text-blue-600';
@@ -941,6 +971,33 @@ export class ScoresComponent implements OnInit {
       data: dialogData,
       panelClass: 'virtual-cpa-calculator-dialog',
       autoFocus: false
+    });
+  }
+
+  openImportScoresDialog() {
+    if (!this.virtualTable) return;
+
+    const dialogData: ImportScoresDialogData = {
+      rawText: '',
+      existingScores: this.virtualTable.scores
+    };
+
+    const ref = this.dialog.open(ImportScoresDialogComponent, {
+      width: '900px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      data: dialogData,
+      panelClass: 'import-scores-dialog',
+      autoFocus: false
+    });
+
+    ref.afterClosed().subscribe((newScores: any[] | null) => {
+      if (!newScores || newScores.length === 0 || !this.virtualTable) return;
+      this.virtualTable.scores.push(...newScores);
+      this.calculateVirtualGPA();
+      this.saveVirtualTableToStorage();
+      this.markAsChanged();
+      this.toastService.success(`Đã thêm ${newScores.length} môn học từ Khảo Thí`, 4000);
     });
   }
 

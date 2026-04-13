@@ -6,33 +6,25 @@
       <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
         <form [formGroup]="scoreForm" class="flex-1 w-full md:w-auto">
           <div class="relative">
-            <input
-              type="text"
-              formControlName="studentCode"
-              placeholder="Nhập mã sinh viên..."
+            <input type="text" formControlName="studentCode" placeholder="Nhập mã sinh viên..."
               class="w-full px-4 py-2.5 border-2 border-white/20 bg-white/10 text-white rounded-lg focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all duration-200 ease-in-out placeholder-white/70"
               [class.border-red-300]="scoreForm.get('studentCode')?.invalid && scoreForm.get('studentCode')?.touched"
-              (keyup.enter)="showVirtualTable = false; loadScores()"
-            />
-            <button
-              type="button"
-              (click)="toggleHistory()"
+              (keyup.enter)="showVirtualTable = false; loadScores()" />
+            <button type="button" (click)="toggleHistory()"
               class="absolute right-2 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white focus:outline-none"
-              title="Lịch sử tra cứu"
-            >
+              title="Lịch sử tra cứu">
               <i class="fas fa-history"></i>
             </button>
           </div>
         </form>
         <div class="flex gap-2 w-full md:w-auto">
-          <button
-            (click)="showVirtualTable = false; loadScores()"
+          <button (click)="showVirtualTable = false; loadScores()"
             class="flex-1 md:flex-none px-6 py-2.5 bg-white text-purple-600 rounded-lg hover:bg-white/90 focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-purple-600 transition-all duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium"
-            [disabled]="scoreForm.invalid || isLoading"
-          >
+            [disabled]="scoreForm.invalid || isLoading">
             <i class="fas fa-search"></i>
             <span>Tra cứu</span>
-            <div *ngIf="isLoading" class="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+            <div *ngIf="isLoading"
+              class="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
           </button>
         </div>
       </div>
@@ -42,26 +34,21 @@
         <div class="bg-gray-50 rounded-lg p-4">
           <div class="flex justify-between items-center mb-3">
             <h3 class="text-lg font-semibold text-gray-700">Lịch sử tra cứu</h3>
-            <button
-              *ngIf="searchHistory.length > 0"
-              (click)="clearHistory()"
-              class="text-red-500 hover:text-red-700 focus:outline-none text-sm"
-            >
+            <button *ngIf="searchHistory.length > 0" (click)="clearHistory()"
+              class="text-red-500 hover:text-red-700 focus:outline-none text-sm">
               <i class="fas fa-trash-alt mr-1"></i>
               Xóa lịch sử
             </button>
           </div>
-          
+
           <div *ngIf="searchHistory.length === 0" class="text-gray-500 text-center py-4">
             Chưa có lịch sử tra cứu
           </div>
-          
+
           <div *ngIf="searchHistory.length > 0" class="space-y-2">
-            <div
-              *ngFor="let item of searchHistory"
+            <div *ngFor="let item of searchHistory"
               class="flex items-center justify-between p-2 hover:bg-white rounded-lg cursor-pointer transition-all duration-200"
-              (click)="showVirtualTable = false; loadFromHistory(item.studentCode)"
-            >
+              (click)="showVirtualTable = false; loadFromHistory(item.studentCode)">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                   <i class="fas fa-user text-blue-500"></i>
@@ -80,10 +67,7 @@
       </div>
 
       <!-- Error Message -->
-      <div
-        *ngIf="errorMessage"
-        class="mt-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded"
-      >
+      <div *ngIf="errorMessage" class="mt-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded">
         <i class="fas fa-exclamation-circle mr-2"></i>
         {{errorMessage}}
       </div>
@@ -96,37 +80,29 @@
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
             <h2 class="text-2xl font-bold text-gray-800">
-              {{scoreData.listScoreDTO.studentDTO.studentName}}
+              {{scoreData.studentDTO.studentName}}
             </h2>
             <p class="text-gray-600">
-              Mã sinh viên: {{scoreData.listScoreDTO.studentDTO.studentCode}}
+              Mã sinh viên: {{scoreData.studentDTO.studentCode}}
             </p>
           </div>
           <div class="flex flex-wrap gap-3">
-            <button
-              *ngIf="scoreData"
+            <button *ngIf="scoreData"
               (click)="isVirtualTableEnabled() ? toggleVirtualTable() : handleVirtualTableAccess()"
               class="relative px-4 py-2 text-white rounded-lg transition-all duration-200 ease-in-out flex items-center gap-2 group"
-              [class.bg-purple-600]="isVirtualTableEnabled()"
-              [class.hover:bg-purple-700]="isVirtualTableEnabled()"
-              [class.bg-gray-600]="!isVirtualTableEnabled()"
-              [class.hover:bg-gray-700]="!isVirtualTableEnabled()"
+              [class.bg-purple-600]="isVirtualTableEnabled()" [class.hover:bg-purple-700]="isVirtualTableEnabled()"
+              [class.bg-gray-600]="!isVirtualTableEnabled()" [class.hover:bg-gray-700]="!isVirtualTableEnabled()"
               [matTooltip]="!loggedInStudentCode ? 'Đăng nhập Lịch thi để sử dụng tính năng bảng điểm ảo' : 
                            !isLoggedInOrCorrectStudent() ? 'Vui lòng tra điểm của chính mình để sử dụng tính năng này' : ''"
-              matTooltipPosition="below"
-            >
+              matTooltipPosition="below">
               <i class="fas" [class.fa-eye-slash]="showVirtualTable" [class.fa-eye]="!showVirtualTable"></i>
               <span>{{showVirtualTable ? 'Ẩn bảng ảo' : 'Hiện bảng ảo'}}</span>
               <!-- Notification dot -->
-              <span 
-                *ngIf="!isLoggedInOrCorrectStudent()"
-                class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"
-              ></span>
+              <span *ngIf="!isLoggedInOrCorrectStudent()"
+                class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
-            <button
-              (click)="toggleGradeTable()"
-              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2"
-            >
+            <button (click)="toggleGradeTable()"
+              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2">
               <i class="fas fa-table"></i>
               <span class="hidden sm:inline">Thang điểm</span>
             </button>
@@ -155,12 +131,15 @@
       </div>
 
       <!-- Virtual Table Loading -->
-      <div *ngIf="showVirtualTable && isLoadingVirtualTable" class="bg-gradient-to-br from-white via-white to-purple-50 rounded-lg shadow-lg overflow-hidden">
+      <div *ngIf="showVirtualTable && isLoadingVirtualTable"
+        class="bg-gradient-to-br from-white via-white to-purple-50 rounded-lg shadow-lg overflow-hidden">
         <div class="p-6 text-center">
           <div class="flex flex-col items-center justify-center py-16">
             <div class="relative">
               <div class="w-12 h-12 border-4 border-purple-200 rounded-full"></div>
-              <div class="absolute top-0 left-0 w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+              <div
+                class="absolute top-0 left-0 w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin">
+              </div>
             </div>
             <div class="mt-6">
               <h3 class="text-lg font-medium text-gray-900 mb-2">Đang tải bảng điểm ảo</h3>
@@ -176,18 +155,18 @@
       </div>
 
       <!-- Virtual Table Empty State -->
-      <div *ngIf="showVirtualTable && !isLoadingVirtualTable && !virtualTable" class="bg-gradient-to-br from-white via-white to-purple-50 rounded-lg shadow-lg overflow-hidden">
+      <div *ngIf="showVirtualTable && !isLoadingVirtualTable && !virtualTable"
+        class="bg-gradient-to-br from-white via-white to-purple-50 rounded-lg shadow-lg overflow-hidden">
         <div class="p-6 text-center">
           <div class="flex flex-col items-center justify-center py-12">
             <div class="bg-purple-100 rounded-full p-4 mb-4">
               <i class="fas fa-table text-purple-600 text-2xl"></i>
             </div>
             <h3 class="text-lg font-medium text-gray-900 mb-2">Chưa có bảng điểm ảo</h3>
-            <p class="text-gray-600 mb-4">Bạn chưa có bảng điểm ảo nào trên server. Hãy tạo bảng điểm ảo mới từ dữ liệu hiện tại.</p>
-            <button
-              (click)="createVirtualTable()"
-              class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2"
-            >
+            <p class="text-gray-600 mb-4">Bạn chưa có bảng điểm ảo nào trên server. Hãy tạo bảng điểm ảo mới từ dữ liệu
+              hiện tại.</p>
+            <button (click)="createVirtualTable()"
+              class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2">
               <i class="fas fa-plus"></i>
               <span>Tạo bảng điểm ảo mới</span>
             </button>
@@ -196,81 +175,130 @@
       </div>
 
       <!-- Virtual Table Section -->
-      <div *ngIf="showVirtualTable && virtualTable && !isLoadingVirtualTable" class="bg-gradient-to-br from-white via-white to-purple-50 rounded-lg shadow-lg overflow-hidden">
+      <div *ngIf="showVirtualTable && virtualTable && !isLoadingVirtualTable"
+        class="bg-gradient-to-br from-white via-white to-purple-50 rounded-lg shadow-lg overflow-hidden">
         <div class="p-6">
           <div class="flex flex-col gap-4">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div class="flex flex-col">
-                <h2 class="text-2xl font-bold text-gray-800">Bảng điểm ảo</h2>
-                <!-- Status indicators -->
-                <div class="flex items-center gap-4 text-sm mt-1">
-                  <div *ngIf="isSavingVirtualTable" class="flex items-center gap-2 text-blue-600">
-                    <div class="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                    <span>Đang lưu dữ liệu lên server...</span>
+
+            <!-- Student Info Card -->
+            <div *ngIf="studentInfo" class="bg-white rounded-lg border border-purple-100 shadow-sm p-4">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                    {{studentInfo.display_name.charAt(0)}}
                   </div>
-                  <div *ngIf="hasUnsavedChanges && !isSavingVirtualTable" class="flex items-center gap-2 text-orange-600">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span>Có thay đổi chưa được lưu lên server</span>
+                  <div>
+                    <div class="font-bold text-gray-800 text-lg">{{studentInfo.display_name}}</div>
+                    <div class="text-sm text-gray-500">{{studentInfo.student_code}} ·
+                      {{virtualTable.studentInfo.studentClass}}</div>
                   </div>
-                  <div *ngIf="!hasUnsavedChanges && !isSavingVirtualTable && isDataLoadedFromServer" class="flex items-center gap-2 text-green-600">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Đã đồng bộ với server</span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-1 text-sm sm:ml-auto">
+                  <div class="flex items-center gap-1.5 text-gray-600">
+                    <i class="fas fa-venus-mars text-purple-400 w-4"></i>
+                    <span>{{studentInfo.gender}}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-gray-600">
+                    <i class="fas fa-birthday-cake text-pink-400 w-4"></i>
+                    <span>{{studentInfo.birthday}}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-gray-600">
+                    <i class="fas fa-phone text-green-400 w-4"></i>
+                    <span>{{studentInfo.phone}}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-gray-600">
+                    <i class="fas fa-envelope text-blue-400 w-4"></i>
+                    <span>{{studentInfo.email}}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-gray-600">
+                    <i class="fas fa-map-marker-alt text-red-400 w-4"></i>
+                    <span>{{studentInfo.birth_place}}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-gray-600">
+                    <i class="fas fa-id-card text-yellow-500 w-4"></i>
+                    <span>{{studentInfo.id_card}}</span>
                   </div>
                 </div>
               </div>
-              <div class="flex flex-wrap gap-2">
-                <button
-                  (click)="selectAllSubjects()"
-                  class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2"
-                >
-                  <i class="fas" [class.fa-check-square]="areAllSubjectsSelected()" [class.fa-square]="!areAllSubjectsSelected()"></i>
-                  <span>Chọn tất cả</span>
-                </button>
-                <button
-                  (click)="addNewSubject()"
-                  class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2"
-                >
-                  <i class="fas fa-plus"></i>
-                  <span>Thêm môn</span>
-                </button>
-                <button
-                  (click)="resetVirtualTable()"
-                  class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2"
-                  title="Khôi phục dữ liệu mới nhất từ tab điểm thường"
-                >
-                  <i class="fas fa-undo"></i>
-                  <span>Khôi phục</span>
-                </button>
-                <button
-                  (click)="openVirtualCPACalculator()"
-                  class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2"
-                >
-                  <i class="fas fa-calculator"></i>
-                  <span>CPA mục tiêu</span>
-                </button>
-                <button
-                  (click)="saveVirtualTableToServer()"
-                  [disabled]="isSavingVirtualTable || !hasUnsavedChanges"
-                  class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <i class="fas fa-cloud-upload-alt" *ngIf="!isSavingVirtualTable"></i>
-                  <div *ngIf="isSavingVirtualTable" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>{{isSavingVirtualTable ? 'Đang lưu...' : 'Lưu lên server'}}</span>
-                </button>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <!-- Status indicator inline -->
+              <div *ngIf="isSavingVirtualTable" class="flex items-center gap-1.5 text-xs text-blue-600 mr-1">
+                <div class="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                <span>Đang lưu...</span>
               </div>
+              <div *ngIf="hasUnsavedChanges && !isSavingVirtualTable"
+                class="flex items-center gap-1.5 text-xs text-orange-600 mr-1">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Chưa lưu</span>
+              </div>
+              <div *ngIf="!hasUnsavedChanges && !isSavingVirtualTable && isDataLoadedFromServer"
+                class="flex items-center gap-1.5 text-xs text-green-600 mr-1">
+                <i class="fas fa-check-circle"></i>
+                <span>Đã đồng bộ</span>
+              </div>
+
+              <button (click)="selectAllSubjects()"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2">
+                <i class="fas" [class.fa-check-square]="areAllSubjectsSelected()"
+                  [class.fa-square]="!areAllSubjectsSelected()"></i>
+                <span>Chọn tất cả</span>
+              </button>
+              <button (click)="addNewSubject()"
+                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2">
+                <i class="fas fa-plus"></i>
+                <span>Thêm môn</span>
+              </button>
+              <button (click)="openImportScoresDialog()"
+                class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2">
+                <i class="fas fa-file-import"></i>
+                <span>Thêm từ Khảo Thí</span>
+              </button>
+              <button (click)="resetVirtualTable()"
+                class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2"
+                title="Khôi phục dữ liệu mới nhất từ tab điểm thường">
+                <i class="fas fa-undo"></i>
+                <span>Khôi phục</span>
+              </button>
+              <button (click)="openVirtualCPACalculator()"
+                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2">
+                <i class="fas fa-calculator"></i>
+                <span>CPA mục tiêu</span>
+              </button>
+              <button (click)="saveVirtualTableToServer()" [disabled]="isSavingVirtualTable || !hasUnsavedChanges"
+                class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 ease-in-out flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fas fa-cloud-upload-alt" *ngIf="!isSavingVirtualTable"></i>
+                <div *ngIf="isSavingVirtualTable"
+                  class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>{{isSavingVirtualTable ? 'Đang lưu...' : 'Lưu lên server'}}</span>
+              </button>
             </div>
 
             <!-- Virtual GPA Display - Moved up -->
             <div class="bg-white rounded-lg border border-gray-100 shadow-sm">
               <div class="flex items-center justify-between p-4">
-                <div class="flex items-center gap-3">
-                  <div class="bg-blue-50 rounded-lg p-3">
-                    <i class="fas fa-calculator text-blue-500 text-lg"></i>
+                <div class="flex items-center gap-6">
+                  <div class="flex items-center gap-3">
+                    <div class="bg-blue-50 rounded-lg p-3">
+                      <i class="fas fa-calculator text-blue-500 text-lg"></i>
+                    </div>
+                    <div>
+                      <div class="text-sm text-gray-500 font-medium">GPA Dự kiến</div>
+                      <div [class]="'text-2xl font-bold ' + getGradeClass(virtualGPA * 2.5)">
+                        {{formatNumber(virtualGPA)}}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div class="text-sm text-gray-500 font-medium">GPA Dự kiến</div>
-                    <div [class]="'text-2xl font-bold ' + getGradeClass(virtualGPA * 2.5)">
-                      {{formatNumber(virtualGPA)}}
+                  <div class="w-px h-10 bg-gray-200"></div>
+                  <div class="flex items-center gap-3">
+                    <div class="bg-green-50 rounded-lg p-3">
+                      <i class="fas fa-layer-group text-green-500 text-lg"></i>
+                    </div>
+                    <div>
+                      <div class="text-sm text-gray-500 font-medium">Tổng tín chỉ tích lũy</div>
+                      <div class="text-2xl font-bold text-green-700">{{totalAccumulatedCredits}}</div>
                     </div>
                   </div>
                 </div>
@@ -303,82 +331,62 @@
                   <i class="fas fa-check-square"></i>
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Môn học</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Tín chỉ</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Điểm GK(TP1)</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Chuyên Cần(TP2)</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Điểm CK</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Điểm TK</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Điểm chữ</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Thao tác</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Tín chỉ
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Điểm
+                  GK(TP1)</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Chuyên
+                  Cần(TP2)</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Điểm CK
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Điểm TK
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Điểm chữ
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Thao tác
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <tr *ngFor="let score of virtualTable.scores; let i = index" [class]="getRowClass(score)">
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <input 
-                    type="checkbox" 
-                    [checked]="score.isSelected"
-                    (change)="toggleSubjectSelection(i)"
-                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
-                  >
+                  <input type="checkbox" [checked]="score.isSelected" (change)="toggleSubjectSelection(i)"
+                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer">
                 </td>
                 <td class="px-6 py-4">
-                  <input 
-                    type="text" 
-                    [(ngModel)]="score.subjectName"
+                  <input type="text" [(ngModel)]="score.subjectName"
                     (blur)="saveVirtualTableToStorage(); markAsChanged()"
                     class="w-full bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none"
-                    placeholder="Nhập tên môn học..."
-                  >
+                    placeholder="Nhập tên môn học...">
                 </td>
                 <td class="px-6 py-4">
-                  <input 
-                    type="number" 
-                    [(ngModel)]="score.subjectCredit"
+                  <input type="number" [(ngModel)]="score.subjectCredit"
                     (blur)="saveVirtualTableToStorage(); markAsChanged()"
                     class="w-20 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center"
-                    min="0"
-                    max="10"
-                    step="1"
-                  >
+                    min="0" max="10" step="1">
                 </td>
                 <td class="px-6 py-4">
                   <div [class]="getScoreClass(score.scoreFirst)">
-                    <input 
-                      type="number" 
-                      [ngModel]="score.scoreFirst"
+                    <input type="number" [ngModel]="score.scoreFirst"
                       (ngModelChange)="score.scoreFirst = parseFloat($event); calculateOverallScore(score); saveVirtualTableToStorage(); markAsChanged()"
                       class="w-20 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center"
-                      min="0"
-                      max="10"
-                      step="0.1"
-                    >
+                      min="0" max="10" step="0.1">
                   </div>
                 </td>
                 <td class="px-6 py-4">
                   <div [class]="getScoreClass(score.scoreSecond)">
-                    <input 
-                      type="number" 
-                      [ngModel]="score.scoreSecond"
+                    <input type="number" [ngModel]="score.scoreSecond"
                       (ngModelChange)="score.scoreSecond = parseFloat($event); calculateOverallScore(score); saveVirtualTableToStorage(); markAsChanged()"
                       class="w-20 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center"
-                      min="0"
-                      max="10"
-                      step="0.1"
-                    >
+                      min="0" max="10" step="0.1">
                   </div>
                 </td>
                 <td class="px-6 py-4">
                   <div [class]="getScoreClass(score.scoreFinal, true, score.scoreOverall)">
-                    <input 
-                      type="number" 
-                      [ngModel]="score.scoreFinal"
+                    <input type="number" [ngModel]="score.scoreFinal"
                       (ngModelChange)="score.scoreFinal = parseFloat($event); calculateOverallScore(score); saveVirtualTableToStorage(); markAsChanged()"
                       class="w-20 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center"
-                      min="0"
-                      max="10"
-                      step="0.1"
-                    >
+                      min="0" max="10" step="0.1">
                   </div>
                 </td>
                 <td class="px-6 py-4">
@@ -392,10 +400,7 @@
                   </span>
                 </td>
                 <td class="px-6 py-4">
-                  <button 
-                    (click)="removeSubject(i)"
-                    class="text-red-500 hover:text-red-700 focus:outline-none"
-                  >
+                  <button (click)="removeSubject(i)" class="text-red-500 hover:text-red-700 focus:outline-none">
                     <i class="fas fa-trash-alt"></i>
                   </button>
                 </td>
@@ -413,7 +418,8 @@
             <div>
               <h4 class="text-sm font-medium text-yellow-800">Thông báo chính thức</h4>
               <p class="mt-1 text-sm text-yellow-700">
-                Bảng điểm ảo này chỉ mang tính chất tham khảo và dự đoán. Kết quả học tập chính thức sẽ được công bố trên hệ thống quản lý đào tạo của Học viện.
+                Bảng điểm ảo này chỉ mang tính chất tham khảo và dự đoán. Kết quả học tập chính thức sẽ được công bố
+                trên hệ thống quản lý đào tạo của Học viện.
               </p>
             </div>
           </div>
@@ -421,59 +427,70 @@
       </div>
 
       <!-- Score Table Section -->
-      <div *ngIf="!showVirtualTable" class="bg-gradient-to-br from-white via-white to-purple-50 rounded-lg shadow-lg overflow-hidden">
+      <div *ngIf="!showVirtualTable"
+        class="bg-gradient-to-br from-white via-white to-purple-50 rounded-lg shadow-lg overflow-hidden">
         <div class="p-6">
           <h2 class="text-2xl font-bold text-gray-800 mb-4">Bảng điểm</h2>
         </div>
-        
+
         <div class="overflow-auto max-h-[600px] border-t border-gray-200">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50 sticky top-0 z-10">
               <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Môn học</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Tín chỉ</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">GK(TP1)</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">CC(TP2)</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Điểm CK</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Điểm TK</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Điểm chữ</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Kỳ hiện tại</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Tín chỉ
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">GK(TP1)
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">CC(TP2)
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Điểm CK
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Điểm TK
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Điểm chữ
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Kỳ hiện
+                  tại</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr *ngFor="let score of scoreData.listScoreDTO.scoreDTOS" [class]="getRowClass(score)"
-                [ngClass]="{
+              <tr *ngFor="let score of scoreData.scoreDTOS" [class]="getRowClass(score)" [ngClass]="{
                   'bg-gradient-to-r from-violet-100 to-purple-100 border-l-4 border-violet-400 hover:from-violet-200 hover:to-purple-200': isCurrentSemesterSubject(score.subjectName) && !isFailedSubject(score.scoreFinal, score.scoreOverall),
                   'bg-red-100 border-l-4 border-red-500': isFailedSubject(score.scoreFinal, score.scoreOverall)
                 }">
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-2">
-                    <span [class.font-medium]="isFailedSubject(score.scoreFinal, score.scoreOverall)">{{score.subjectName}}</span>
+                    <span
+                      [class.font-medium]="isFailedSubject(score.scoreFinal, score.scoreOverall)">{{score.subjectName}}</span>
                     <div class="flex items-center gap-1">
-                      <i *ngIf="isCurrentSemesterSubject(score.subjectName) && !isFailedSubject(score.scoreFinal, score.scoreOverall)" 
-                         class="fas fa-star text-violet-500 text-sm animate-pulse" 
-                         title="Môn học kỳ này"></i>
+                      <i *ngIf="isCurrentSemesterSubject(score.subjectName) && !isFailedSubject(score.scoreFinal, score.scoreOverall)"
+                        class="fas fa-star text-violet-500 text-sm animate-pulse" title="Môn học kỳ này"></i>
                       <i *ngIf="isFailedSubject(score.scoreFinal, score.scoreOverall)"
-                         class="fas fa-exclamation-circle text-red-600 text-sm"
-                         title="Môn học không đạt"></i>
+                        class="fas fa-exclamation-circle text-red-600 text-sm" title="Môn học không đạt"></i>
                     </div>
                   </div>
                 </td>
                 <td class="px-6 py-4">{{score.subjectCredit}}</td>
                 <td class="px-6 py-4" [class]="getScoreClass(score.scoreFirst)">{{formatNumber(score.scoreFirst)}}</td>
-                <td class="px-6 py-4" [class]="getScoreClass(score.scoreSecond)">{{formatNumber(score.scoreSecond)}}</td>
-                <td class="px-6 py-4" [class]="getScoreClass(score.scoreFinal, true, score.scoreOverall)">{{formatNumber(score.scoreFinal)}}</td>
-                <td class="px-6 py-4" [class]="getScoreClass(score.scoreOverall, true, score.scoreOverall)">{{formatNumber(score.scoreOverall)}}</td>
-                <td class="px-6 py-4" [class]="getGradeClass(score.scoreOverall)">{{getLetterGrade(score.scoreOverall, score.scoreFinal)}}</td>
+                <td class="px-6 py-4" [class]="getScoreClass(score.scoreSecond)">{{formatNumber(score.scoreSecond)}}
+                </td>
+                <td class="px-6 py-4" [class]="getScoreClass(score.scoreFinal, true, score.scoreOverall)">
+                  {{formatNumber(score.scoreFinal)}}</td>
+                <td class="px-6 py-4" [class]="getScoreClass(score.scoreOverall, true, score.scoreOverall)">
+                  {{formatNumber(score.scoreOverall)}}</td>
+                <td class="px-6 py-4" [class]="getGradeClass(score.scoreOverall)">{{getLetterGrade(score.scoreOverall,
+                  score.scoreFinal)}}</td>
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-2">
-                    <span *ngIf="isCurrentSemesterSubject(score.subjectName) && !isFailedSubject(score.scoreFinal, score.scoreOverall)" 
-                          class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 border border-violet-200 shadow-sm">
+                    <span
+                      *ngIf="isCurrentSemesterSubject(score.subjectName) && !isFailedSubject(score.scoreFinal, score.scoreOverall)"
+                      class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-violet-100 to-purple-100 text-violet-700 border border-violet-200 shadow-sm">
                       <i class="fas fa-check-circle mr-1"></i>
                       Kỳ này
                     </span>
                     <span *ngIf="isFailedSubject(score.scoreFinal, score.scoreOverall)"
-                          class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-300 shadow-sm">
+                      class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-300 shadow-sm">
                       <i class="fas fa-times-circle mr-1"></i>
                       Không đạt
                     </span>
@@ -493,7 +510,8 @@
             <div>
               <h4 class="text-sm font-medium text-blue-800">Thông báo chính thức</h4>
               <p class="mt-1 text-sm text-blue-700">
-                Đây là bảng điểm chính thức được đồng bộ từ hệ thống quản lý đào tạo của Học viện. Mọi thắc mắc về điểm số vui lòng liên hệ với phòng Khảo thí và Đảm bảo chất lượng đào tạo.
+                Đây là bảng điểm chính thức được đồng bộ từ hệ thống quản lý đào tạo của Học viện. Mọi thắc mắc về điểm
+                số vui lòng liên hệ với phòng Khảo thí và Đảm bảo chất lượng đào tạo.
               </p>
             </div>
           </div>

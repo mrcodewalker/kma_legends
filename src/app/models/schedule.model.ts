@@ -3,6 +3,12 @@ export interface StudentInfo {
   gender: string;
   student_code: string;
   display_name: string;
+  phone?: string;
+  id_card?: string;
+  birth_place?: string;
+  enroll_semester?: string;
+  email?: string;
+  bank_account?: string;
 }
 
 export interface CourseSchedule {
@@ -31,4 +37,7 @@ export interface CalendarEvent {
   teacher: string;
   courseCode: string;
   className?: string[];
+  backgroundColor?: string;
+  borderColor?: string;
+  textColor?: string;
 } 

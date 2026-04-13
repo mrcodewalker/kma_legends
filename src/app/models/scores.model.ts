@@ -1,44 +1,80 @@
+export interface StudentInfo {
+  display_name: string;
+  student_code: string;
+  gender: string;
+  birthday: string;
+  birth_place: string;
+  id_card: string;
+  bank_account: string;
+  enroll_semester: string;
+  phone: string;
+  email: string;
+}
+
 export interface StudentDTO {
-  studentId: number;
   studentCode: string;
-  studentName: string;
+  studentName: string; // masked: N* V* A*
   studentClass: string;
 }
 
 export interface ScoreDTO {
-  id: number;
-  studentId: number;
-  subjectId: number;
   scoreText: string;
   scoreFirst: number;
   scoreSecond: number;
   scoreFinal: number;
   scoreOverall: number;
-  semester: string;
-  subjectName: string;
+  subjectName: string; // masked: giữ 3 ký tự đầu
   subjectCredit: number;
 }
 
-export interface SubjectDTO {
-  subjectId: number;
-  subjectName: string;
-  subjectCredits: number;
-}
-
 export interface ListScoreResponse {
-  listScoreDTO: {
-    studentDTO: StudentDTO;
-    scoreDTOS: ScoreDTO[];
-  };
-  subjectDTOS: SubjectDTO[];
+  studentDTO: StudentDTO;
+  scoreDTOS: ScoreDTO[];
 }
 
-export interface VirtualScore extends Omit<ScoreDTO, 'id' | 'studentId' | 'subjectId' | 'semester'> {
+export interface VirtualScore {
+  scoreText: string;
+  scoreFirst: number;
+  scoreSecond: number;
+  scoreFinal: number;
+  scoreOverall: number;
+  subjectName: string;
+  subjectCredit: number;
   isSelected: boolean;
 }
 
+// Score Batch (bảng điểm ảo lưu server)
+export interface ScoreBatchRequest {
+  studentInfo: {
+    studentCode: string;
+    studentName: string;
+    studentClass: string;
+  };
+  scores: VirtualScore[];
+  lastUpdated?: string; // ISO 8601
+}
+
+export interface ScoreBatch {
+  batchId: number;
+  studentCode: string;
+  studentName: string;
+  studentClass: string;
+  lastUpdated: string;
+  scoreItems: (VirtualScore & { itemId: number })[];
+}
+
+// Response từ endpoint /score-batch/student/encrypted
+export interface EncryptedScoreBatchResponse {
+  student_info: StudentInfo;
+  score_batch: ScoreBatch;
+}
+
 export interface VirtualScoreTable {
-  studentInfo: StudentDTO;
+  studentInfo: {
+    studentCode: string;
+    studentName: string;
+    studentClass: string;
+  };
   scores: VirtualScore[];
   lastUpdated: Date;
 }
