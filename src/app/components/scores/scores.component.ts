@@ -939,6 +939,13 @@ export class ScoresComponent implements OnInit {
     return Math.min(10, Math.max(0, Math.round(parsed * 10) / 10));
   }
 
+  // Handles both dot and comma as decimal separator (for mobile keyboards)
+  parseScoreInput(value: string | number): number {
+    if (typeof value === 'number') return this.parseFloat(value);
+    const normalized = value.replace(',', '.');
+    return this.parseFloat(normalized);
+  }
+
   handleEnterKey(event: Event) {
     const target = event.target as HTMLInputElement;
     if (target) {
