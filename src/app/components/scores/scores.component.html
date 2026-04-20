@@ -360,31 +360,31 @@
                     placeholder="Nhập tên môn học...">
                 </td>
                 <td class="px-6 py-4">
-                  <input type="text" inputmode="numeric" [(ngModel)]="score.subjectCredit"
-                    (blur)="saveVirtualTableToStorage(); markAsChanged()"
+                  <input type="text" inputmode="numeric" #creditInput [ngModel]="score.subjectCredit"
+                    (blur)="score.subjectCredit = parseIntInput(creditInput.value); saveVirtualTableToStorage(); markAsChanged()"
                     class="w-20 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center"
                     pattern="[0-9]*">
                 </td>
                 <td class="px-6 py-4">
                   <div [class]="getScoreClass(score.scoreFirst)">
-                    <input type="text" inputmode="decimal" [ngModel]="score.scoreFirst"
-                      (ngModelChange)="score.scoreFirst = parseScoreInput($event); calculateOverallScore(score); saveVirtualTableToStorage(); markAsChanged()"
+                    <input type="text" inputmode="decimal" #scoreFirstInput [ngModel]="score.scoreFirst"
+                      (blur)="score.scoreFirst = parseScoreInput(scoreFirstInput.value); calculateOverallScore(score); saveVirtualTableToStorage(); markAsChanged()"
                       class="w-20 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center"
                       pattern="[0-9]*[.,]?[0-9]*">
                   </div>
                 </td>
                 <td class="px-6 py-4">
                   <div [class]="getScoreClass(score.scoreSecond)">
-                    <input type="text" inputmode="decimal" [ngModel]="score.scoreSecond"
-                      (ngModelChange)="score.scoreSecond = parseScoreInput($event); calculateOverallScore(score); saveVirtualTableToStorage(); markAsChanged()"
+                    <input type="text" inputmode="decimal" #scoreSecondInput [ngModel]="score.scoreSecond"
+                      (blur)="score.scoreSecond = parseScoreInput(scoreSecondInput.value); calculateOverallScore(score); saveVirtualTableToStorage(); markAsChanged()"
                       class="w-20 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center"
                       pattern="[0-9]*[.,]?[0-9]*">
                   </div>
                 </td>
                 <td class="px-6 py-4">
                   <div [class]="getScoreClass(score.scoreFinal, true, score.scoreOverall)">
-                    <input type="text" inputmode="decimal" [ngModel]="score.scoreFinal"
-                      (ngModelChange)="score.scoreFinal = parseScoreInput($event); calculateOverallScore(score); saveVirtualTableToStorage(); markAsChanged()"
+                    <input type="text" inputmode="decimal" #scoreFinalInput [ngModel]="score.scoreFinal"
+                      (blur)="score.scoreFinal = parseScoreInput(scoreFinalInput.value); calculateOverallScore(score); saveVirtualTableToStorage(); markAsChanged()"
                       class="w-20 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center"
                       pattern="[0-9]*[.,]?[0-9]*">
                   </div>

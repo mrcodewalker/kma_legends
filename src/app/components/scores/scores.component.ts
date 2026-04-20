@@ -946,6 +946,13 @@ export class ScoresComponent implements OnInit {
     return this.parseFloat(normalized);
   }
 
+  // Parse integer input for credits
+  parseIntInput(value: string | number): number {
+    const parsed = typeof value === 'string' ? parseInt(value, 10) : value;
+    if (isNaN(parsed)) return 0;
+    return Math.max(0, parsed);
+  }
+
   handleEnterKey(event: Event) {
     const target = event.target as HTMLInputElement;
     if (target) {
