@@ -160,7 +160,7 @@ export class VirtualCalendarComponent implements OnInit {
     if (!this.virtualCalendarData) return;
 
     this.availableCourseBlocks = Array.from(
-      new Set(this.virtualCalendarData.virtual_calendar.map(item => item.course))
+      new Set(this.virtualCalendarData.data.virtual_calendar.map(item => item.course))
     ).sort();
   }
 
@@ -170,7 +170,7 @@ export class VirtualCalendarComponent implements OnInit {
     this.selectedClass = null;
     
     if (this.virtualCalendarData) {
-      const coursesInBlock = this.virtualCalendarData.virtual_calendar
+      const coursesInBlock = this.virtualCalendarData.data.virtual_calendar
         .filter(item => item.course === courseBlock);
 
       this.availableCourses = Array.from(
@@ -179,8 +179,8 @@ export class VirtualCalendarComponent implements OnInit {
           code: item.details.course_code
         })))
       )
-      .map(str => JSON.parse(str))
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .map((str: string) => JSON.parse(str))
+      .sort((a: any, b: any) => a.name.localeCompare(b.name));
     }
   }
 
@@ -189,7 +189,7 @@ export class VirtualCalendarComponent implements OnInit {
     this.selectedClass = null;
 
     if (this.virtualCalendarData) {
-      const courseClasses = this.virtualCalendarData.virtual_calendar
+      const courseClasses = this.virtualCalendarData.data.virtual_calendar
         .filter(item => 
           item.course === this.selectedCourseBlock && 
           item.details.course_code === courseCode
@@ -416,7 +416,7 @@ export class VirtualCalendarComponent implements OnInit {
 
       for (const courseName of courseNames) {
         // Tìm lớp học trong virtualCalendarData
-        const matchingClass = this.virtualCalendarData.virtual_calendar.find(
+        const matchingClass = this.virtualCalendarData.data.virtual_calendar.find(
           item => item.details.course_name === courseName
         );
 

@@ -16,7 +16,11 @@ export class VirtualCalendarService {
     if (data) {
       return of(JSON.parse(data));
     }
-    return of({ virtual_calendar: [], code: "404", message: "No data found" });
+    return of({ 
+      data: { virtual_calendar: [], student_info: {} as any }, 
+      code: "404", 
+      message: "No data found" 
+    });
   }
 
   addSelectedClass(newClass: CourseClass) {
