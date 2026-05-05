@@ -10,14 +10,19 @@
       </h1>
       <p class="text-2xl md:text-3xl mb-8 opacity-90 font-primary">Hệ thống quản lý học tập thông minh</p>
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-2">
-        <button class="btn-primary text-lg" (click)="this.router.navigate(['/scores'])">
+        <button class="btn-primary" (click)="this.router.navigate(['/scores'])">
           Bắt đầu ngay
         </button>
         <button *ngIf="canInstall" (click)="installPwa()"
-          class="px-6 py-3 bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-semibold rounded-lg text-lg flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl">
+          class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transform hover:scale-105 transition-all duration-300 flex items-center gap-2 shadow-lg">
           <i class="fas fa-download"></i>
           Tải về
         </button>
+        <a href="assets/KMALegend.apk" download="KMALegend.apk"
+          class="bg-green-500 hover:bg-green-400 text-white px-6 py-3 rounded-lg font-semibold transform hover:scale-105 transition-all duration-300 flex items-center gap-2 shadow-lg">
+          <i class="fab fa-android"></i>
+          Tải APK
+        </a>
       </div>
 
       <!-- iOS Install Guide Popup -->
