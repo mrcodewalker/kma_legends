@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -9,7 +9,31 @@ import { Router } from '@angular/router';
 export class HomeComponent implements OnInit {
   authorName = 'Mr.CodeWalker x Hải Code Dạo';
   currentSlide = 0;
-  constructor(readonly router: Router) {}
+  deferredPrompt: any = null;
+  canInstall = false;
+
+  constructor(readonly router: Router) { }
+
+  @HostListener('window:beforeinstallprompt', ['$event'])
+  onBeforeInstallPrompt(event: Event) {
+    event.preventDefault();
+    this.deferredPrompt = event;
+    this.canInstall = true;
+  }
+
+  @HostListener('window:appinstalled')
+  onAppInstalled() {
+    this.canInstall = false;
+    this.deferredPrompt = null;
+  }
+
+  async installPwa() {
+    if (!this.deferredPrompt) return;
+    this.deferredPrompt.prompt();
+    const { outcome } = await this.deferredPrompt.userChoice;
+    if (outcome === 'accepted') this.canInstall = false;
+    this.deferredPrompt = null;
+  }
   slides = [
     {
       image: 'assets/images/TV.jpg',
