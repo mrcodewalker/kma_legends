@@ -11,6 +11,8 @@ export class HomeComponent implements OnInit {
   currentSlide = 0;
   deferredPrompt: any = null;
   canInstall = false;
+  isIos = false;
+  showIosInstallGuide = false;
 
   constructor(readonly router: Router) { }
 
@@ -27,7 +29,22 @@ export class HomeComponent implements OnInit {
     this.deferredPrompt = null;
   }
 
+  ngOnInit() {
+    this.startSlideShow();
+    // Detect iOS và chưa cài PWA
+    const ua = window.navigator.userAgent;
+    this.isIos = /iphone|ipad|ipod/i.test(ua);
+    const isStandalone = ('standalone' in window.navigator) && (window.navigator as any).standalone;
+    if (this.isIos && !isStandalone) {
+      this.canInstall = true;
+    }
+  }
+
   async installPwa() {
+    if (this.isIos) {
+      this.showIosInstallGuide = true;
+      return;
+    }
     if (!this.deferredPrompt) return;
     this.deferredPrompt.prompt();
     const { outcome } = await this.deferredPrompt.userChoice;
@@ -170,10 +187,6 @@ export class HomeComponent implements OnInit {
       icon: 'fa-handshake'
     }
   ];
-
-  ngOnInit() {
-    this.startSlideShow();
-  }
 
   startSlideShow() {
     setInterval(() => {

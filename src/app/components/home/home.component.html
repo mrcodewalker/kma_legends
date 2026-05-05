@@ -19,6 +19,44 @@
           Tải về
         </button>
       </div>
+
+      <!-- iOS Install Guide Popup -->
+      <div *ngIf="showIosInstallGuide" class="fixed inset-0 z-50 flex items-end justify-center bg-black/50 px-4 pb-6"
+        (click)="showIosInstallGuide = false">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-gray-800"
+          (click)="$event.stopPropagation()">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-lg flex items-center gap-2">
+              <i class="fab fa-apple text-gray-700"></i> Cài đặt trên iPhone
+            </h3>
+            <button (click)="showIosInstallGuide = false" class="text-gray-400 hover:text-gray-600">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <ol class="space-y-3 text-sm text-gray-600">
+            <li class="flex items-start gap-3">
+              <span
+                class="bg-blue-100 text-blue-700 font-bold rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+              <span>Nhấn nút <strong>Chia sẻ</strong> <i class="fas fa-share-square text-blue-500"></i> ở thanh dưới
+                Safari</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span
+                class="bg-blue-100 text-blue-700 font-bold rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+              <span>Cuộn xuống và chọn <strong>"Thêm vào Màn hình chính"</strong></span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span
+                class="bg-blue-100 text-blue-700 font-bold rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+              <span>Nhấn <strong>"Thêm"</strong> ở góc trên bên phải</span>
+            </li>
+          </ol>
+          <div class="mt-4 p-3 bg-yellow-50 rounded-lg text-xs text-yellow-700 flex items-start gap-2">
+            <i class="fas fa-info-circle mt-0.5"></i>
+            <span>Chỉ hoạt động khi mở bằng Safari. Không hỗ trợ Chrome/Firefox trên iOS.</span>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 

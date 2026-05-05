@@ -2,7 +2,7 @@
     "name": "KMA Legend - Tra cứu học vụ",
     "short_name": "KMA Legend",
     "description": "Tra cứu lịch học, điểm số và học bổng KMA",
-    "theme_color": "#1d4ed8",
+    "theme_color": "#dc2626",
     "background_color": "#ffffff",
     "display": "standalone",
     "scope": "/",
