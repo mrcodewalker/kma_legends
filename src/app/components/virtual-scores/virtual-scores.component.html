@@ -1,0 +1,347 @@
+<!-- Virtual Scores Page -->
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+
+  <!-- ── NOT LOGGED IN ─────────────────────────────────────────────────────── -->
+  <div *ngIf="!isLoggedIn" class="flex items-center justify-center min-h-screen px-4">
+    <div class="vs-login-card" @fadeSlideIn>
+      <!-- Icon -->
+      <div class="flex justify-center mb-6">
+        <div class="vs-icon-ring">
+          <i class="fas fa-lock text-purple-500 text-3xl"></i>
+        </div>
+      </div>
+
+      <h1 class="text-2xl font-bold text-gray-800 text-center mb-2">Bảng điểm ảo</h1>
+      <p class="text-gray-500 text-center mb-8 leading-relaxed">
+        Bạn cần đăng nhập vào <strong>Lịch học</strong> để sử dụng tính năng này.<br>
+        Hệ thống sẽ tự động lấy dữ liệu điểm của bạn.
+      </p>
+
+      <div class="space-y-4 mb-6">
+        <div class="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
+          <i class="fas fa-user-shield text-purple-500 mt-0.5 flex-shrink-0"></i>
+          <p class="text-sm text-purple-700">Chỉ có thể xem và chỉnh sửa bảng điểm ảo của <strong>chính mình</strong></p>
+        </div>
+        <div class="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
+          <i class="fas fa-cloud text-blue-500 mt-0.5 flex-shrink-0"></i>
+          <p class="text-sm text-blue-700">Dữ liệu được đồng bộ lên server sau mỗi lần lưu</p>
+        </div>
+        <div class="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
+          <i class="fas fa-calculator text-green-500 mt-0.5 flex-shrink-0"></i>
+          <p class="text-sm text-green-700">Tính GPA dự kiến và CPA mục tiêu cuối khóa</p>
+        </div>
+      </div>
+
+      <button (click)="goToLogin()"
+        class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-purple-200 flex items-center justify-center gap-2">
+        <i class="fas fa-sign-in-alt"></i>
+        Đến trang Lịch học để đăng nhập
+      </button>
+    </div>
+  </div>
+
+  <!-- ── LOGGED IN ─────────────────────────────────────────────────────────── -->
+  <div *ngIf="isLoggedIn" class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 mt-12 sm:mt-16">
+
+    <!-- Page Header -->
+    <div class="vs-page-header mb-6" @fadeSlideIn>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+            <i class="fas fa-table text-purple-300"></i>
+            Bảng điểm ảo
+          </h1>
+          <p class="text-purple-200 text-sm mt-1">
+            Đang xem: <span class="font-semibold text-white">{{loggedInStudentName || loggedInStudentCode}}</span>
+            <span class="mx-2 opacity-40">·</span>
+            <span class="font-mono">{{loggedInStudentCode}}</span>
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <!-- Sync status -->
+          <div *ngIf="isSavingVirtualTable" class="flex items-center gap-1.5 text-xs text-blue-200">
+            <div class="w-3 h-3 border-2 border-blue-300 border-t-transparent rounded-full animate-spin"></div>
+            <span>Đang lưu...</span>
+          </div>
+          <div *ngIf="hasUnsavedChanges && !isSavingVirtualTable"
+            class="flex items-center gap-1.5 text-xs text-orange-300">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Chưa lưu</span>
+          </div>
+          <div *ngIf="!hasUnsavedChanges && !isSavingVirtualTable && isDataLoadedFromServer"
+            class="flex items-center gap-1.5 text-xs text-green-300">
+            <i class="fas fa-check-circle"></i>
+            <span>Đã đồng bộ</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg flex items-center gap-2">
+      <i class="fas fa-exclamation-circle flex-shrink-0"></i>
+      <span>{{errorMessage}}</span>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoadingVirtualTable" class="vs-card" @fadeSlideIn>
+      <div class="flex flex-col items-center justify-center py-20">
+        <div class="relative mb-6">
+          <div class="w-14 h-14 border-4 border-purple-100 rounded-full"></div>
+          <div class="absolute top-0 left-0 w-14 h-14 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-700 mb-1">Đang tải bảng điểm ảo</h3>
+        <p class="text-gray-400 text-sm">Vui lòng chờ trong giây lát...</p>
+        <div class="flex gap-1 mt-4">
+          <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
+          <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay:.1s"></div>
+          <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay:.2s"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Data State -->
+    <div *ngIf="!isLoadingVirtualTable && !virtualTable" class="vs-card" @fadeSlideIn>
+      <div class="flex flex-col items-center justify-center py-16 text-center">
+        <div class="w-20 h-20 bg-purple-50 rounded-full flex items-center justify-center mb-5">
+          <i class="fas fa-table text-purple-400 text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">Chưa có bảng điểm ảo</h3>
+        <p class="text-gray-400 max-w-sm mb-6">Chưa tìm thấy dữ liệu điểm của bạn trong hệ thống. Hãy tạo bảng trống để bắt đầu.</p>
+        <button (click)="createEmptyVirtualTable()"
+          class="px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all duration-200 flex items-center gap-2 shadow-md">
+          <i class="fas fa-plus"></i>
+          Tạo bảng điểm ảo mới
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Virtual Table -->
+    <div *ngIf="!isLoadingVirtualTable && virtualTable" @fadeSlideIn>
+
+      <!-- Student Info Card -->
+      <div *ngIf="studentInfo" class="vs-card mb-4 p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+              {{(studentInfo!.display_name || loggedInStudentCode || '?').charAt(0)}}
+            </div>
+            <div>
+              <div class="font-bold text-gray-800 text-base">{{studentInfo!.display_name}}</div>
+              <div class="text-sm text-gray-500">{{studentInfo!.student_code}} · {{virtualTable!.studentInfo.studentClass}}</div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-1.5 text-sm sm:ml-auto">
+            <div class="flex items-center gap-1.5 text-gray-600">
+              <i class="fas fa-venus-mars text-purple-400 w-4"></i>
+              <span>{{studentInfo!.gender}}</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-gray-600">
+              <i class="fas fa-birthday-cake text-pink-400 w-4"></i>
+              <span>{{studentInfo!.birthday}}</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-gray-600">
+              <i class="fas fa-phone text-green-400 w-4"></i>
+              <span>{{studentInfo!.phone}}</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-gray-600">
+              <i class="fas fa-envelope text-blue-400 w-4"></i>
+              <span>{{studentInfo!.email}}</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-gray-600">
+              <i class="fas fa-map-marker-alt text-red-400 w-4"></i>
+              <span>{{studentInfo!.birth_place}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GPA Summary Card -->
+      <div class="vs-card mb-4 p-5">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
+          <div class="flex items-center gap-6">
+            <!-- Virtual GPA -->
+            <div class="flex items-center gap-3">
+              <div class="bg-blue-50 rounded-xl p-3">
+                <i class="fas fa-calculator text-blue-500 text-lg"></i>
+              </div>
+              <div>
+                <div class="text-xs text-gray-500 font-medium">GPA Dự kiến</div>
+                <div [class]="'text-2xl font-bold ' + getGradeClass(virtualGPA * 2.5)">
+                  {{formatNumber(virtualGPA)}}
+                </div>
+              </div>
+            </div>
+            <div class="w-px h-10 bg-gray-200 hidden sm:block"></div>
+            <!-- Accumulated Credits -->
+            <div class="flex items-center gap-3">
+              <div class="bg-green-50 rounded-xl p-3">
+                <i class="fas fa-layer-group text-green-500 text-lg"></i>
+              </div>
+              <div>
+                <div class="text-xs text-gray-500 font-medium">Tổng tín chỉ tích lũy</div>
+                <div class="text-2xl font-bold text-green-700">{{totalAccumulatedCredits}}</div>
+              </div>
+            </div>
+          </div>
+          <div class="text-xs text-gray-400 space-y-1">
+            <div class="flex items-center gap-1.5">
+              <i class="fas fa-check-circle text-green-500"></i>
+              <span>Chỉ tính GPA cho các môn đã chọn</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <i class="fas fa-info-circle text-blue-500"></i>
+              <span>GDTC và TH Vật lý không tính vào GPA</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Toolbar -->
+      <div class="vs-card mb-4 p-4">
+        <div class="flex flex-wrap items-center gap-2">
+          <button (click)="selectAllSubjects()"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 flex items-center gap-2 text-sm">
+            <i class="fas" [class.fa-check-square]="areAllSubjectsSelected()" [class.fa-square]="!areAllSubjectsSelected()"></i>
+            <span>Chọn tất cả</span>
+          </button>
+          <button (click)="addNewSubject()"
+            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center gap-2 text-sm">
+            <i class="fas fa-plus"></i>
+            <span>Thêm môn</span>
+          </button>
+          <button (click)="openImportScoresDialog()"
+            class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all duration-200 flex items-center gap-2 text-sm">
+            <i class="fas fa-file-import"></i>
+            <span>Thêm từ Khảo Thí</span>
+          </button>
+          <button (click)="resetVirtualTable()"
+            class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-all duration-200 flex items-center gap-2 text-sm"
+            title="Khôi phục dữ liệu chính thức từ server">
+            <i class="fas fa-undo"></i>
+            <span>Khôi phục</span>
+          </button>
+          <button (click)="openVirtualCPACalculator()"
+            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-200 flex items-center gap-2 text-sm">
+            <i class="fas fa-calculator"></i>
+            <span>CPA mục tiêu</span>
+          </button>
+          <!-- Stats Button -->
+          <button (click)="openStatsDialog()"
+            class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 flex items-center gap-2 text-sm shadow-md"
+            title="Xem thống kê xếp loại">
+            <i class="fas fa-chart-bar"></i>
+            <span>Thống kê</span>
+          </button>
+          <button (click)="saveVirtualTableToServer()" [disabled]="isSavingVirtualTable || !hasUnsavedChanges"
+            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all duration-200 flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed ml-auto">
+            <i class="fas fa-cloud-upload-alt" *ngIf="!isSavingVirtualTable"></i>
+            <div *ngIf="isSavingVirtualTable" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <span>{{isSavingVirtualTable ? 'Đang lưu...' : 'Lưu lên server'}}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="vs-card overflow-hidden">
+        <div class="virtual-table-container overflow-auto max-h-[600px]">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50 sticky top-0 z-10">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-8">
+                  <i class="fas fa-check-square"></i>
+                </th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Môn học</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-20">Tín chỉ</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-24">GK (TP1)</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-24">CC (TP2)</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-24">Điểm CK</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-24">Điểm TK</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-16">Chữ</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-16">Xóa</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr *ngFor="let score of virtualTable.scores; let i = index" [class]="getRowClass(score)">
+                <td class="px-4 py-3">
+                  <input type="checkbox" [checked]="score.isSelected" (change)="toggleSubjectSelection(i)"
+                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer">
+                </td>
+                <td class="px-4 py-3 min-w-[180px]">
+                  <input type="text" [(ngModel)]="score.subjectName"
+                    (focus)="onInputFocus(score.subjectName)"
+                    (blur)="markAsChangedIfDifferent(score.subjectName)"
+                    class="w-full bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-sm"
+                    placeholder="Nhập tên môn học...">
+                </td>
+                <td class="px-4 py-3">
+                  <input type="text" inputmode="numeric" #creditInput [ngModel]="score.subjectCredit"
+                    (focus)="onInputFocus(score.subjectCredit)"
+                    (blur)="score.subjectCredit = parseIntInput(creditInput.value); markAsChangedIfDifferent(creditInput.value)"
+                    class="w-16 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center text-sm"
+                    pattern="[0-9]*">
+                </td>
+                <td class="px-4 py-3">
+                  <div [class]="getScoreClass(score.scoreFirst)">
+                    <input type="text" inputmode="decimal" #scoreFirstInput [ngModel]="score.scoreFirst"
+                      (focus)="onInputFocus(score.scoreFirst)"
+                      (blur)="score.scoreFirst = parseScoreInput(scoreFirstInput.value); calculateOverallScore(score); markAsChangedIfDifferent(scoreFirstInput.value)"
+                      class="w-16 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center text-sm"
+                      pattern="[0-9]*[.,]?[0-9]*">
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <div [class]="getScoreClass(score.scoreSecond)">
+                    <input type="text" inputmode="decimal" #scoreSecondInput [ngModel]="score.scoreSecond"
+                      (focus)="onInputFocus(score.scoreSecond)"
+                      (blur)="score.scoreSecond = parseScoreInput(scoreSecondInput.value); calculateOverallScore(score); markAsChangedIfDifferent(scoreSecondInput.value)"
+                      class="w-16 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center text-sm"
+                      pattern="[0-9]*[.,]?[0-9]*">
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <div [class]="getScoreClass(score.scoreFinal, true, score.scoreOverall)">
+                    <input type="text" inputmode="decimal" #scoreFinalInput [ngModel]="score.scoreFinal"
+                      (focus)="onInputFocus(score.scoreFinal)"
+                      (blur)="score.scoreFinal = parseScoreInput(scoreFinalInput.value); calculateOverallScore(score); markAsChangedIfDifferent(scoreFinalInput.value)"
+                      class="w-16 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none text-center text-sm"
+                      pattern="[0-9]*[.,]?[0-9]*">
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <span [class]="getScoreClass(score.scoreOverall, true, score.scoreOverall) + ' text-sm'">
+                    {{formatNumber(score.scoreOverall)}}
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <span [class]="getGradeClass(score.scoreOverall) + ' text-sm'">
+                    {{getLetterGrade(score.scoreOverall, score.scoreFinal)}}
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <button (click)="removeSubject(i)" class="text-red-400 hover:text-red-600 focus:outline-none transition-colors duration-150">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Notice -->
+        <div class="p-4 bg-amber-50 border-t border-amber-100">
+          <div class="flex items-start gap-3">
+            <i class="fas fa-exclamation-triangle text-amber-500 flex-shrink-0 mt-0.5"></i>
+            <div>
+              <h4 class="text-sm font-semibold text-amber-800">Lưu ý</h4>
+              <p class="mt-0.5 text-sm text-amber-700">
+                Bảng điểm ảo chỉ mang tính chất tham khảo và dự đoán. Kết quả học tập chính thức được công bố trên hệ thống quản lý đào tạo của Học viện.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main content -->
+  </div><!-- /container -->
+</div><!-- /min-h-screen -->

@@ -1,0 +1,156 @@
+<div class="stats-dialog">
+
+  <!-- ── Header ── -->
+  <div class="stats-header">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="header-icon">
+          <i class="fas fa-chart-bar text-white text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-white">Thống kê bảng điểm ảo</h2>
+          <p class="text-purple-200 text-sm mt-0.5">{{data.studentName}}</p>
+        </div>
+      </div>
+      <button (click)="close()" class="close-btn">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="stats-body">
+
+    <!-- ── Summary Cards ── -->
+    <div class="summary-grid">
+      <div class="summary-card card-blue">
+        <div class="summary-icon"><i class="fas fa-book-open"></i></div>
+        <div class="summary-value">{{totalSelected}}</div>
+        <div class="summary-label">Môn đã chọn</div>
+      </div>
+      <div class="summary-card card-green">
+        <div class="summary-icon"><i class="fas fa-layer-group"></i></div>
+        <div class="summary-value">{{totalCredits}}</div>
+        <div class="summary-label">Tín chỉ tích lũy</div>
+      </div>
+      <div class="summary-card card-check">
+        <div class="summary-icon"><i class="fas fa-check-circle"></i></div>
+        <div class="summary-value">{{passedCount}}</div>
+        <div class="summary-label">Môn đạt</div>
+      </div>
+      <div class="summary-card card-red">
+        <div class="summary-icon"><i class="fas fa-times-circle"></i></div>
+        <div class="summary-value">{{failedCount}}</div>
+        <div class="summary-label">Môn trượt</div>
+      </div>
+    </div>
+
+    <!-- ── GPA Hero ── -->
+    <div class="gpa-hero" [ngClass]="getGpaClass()">
+      <div class="gpa-ring">
+        <svg viewBox="0 0 120 120" class="gpa-svg">
+          <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" stroke-width="6" opacity="0.15"/>
+          <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" stroke-width="6"
+            stroke-dasharray="326.7"
+            [attr.stroke-dashoffset]="animating ? (326.7 * (1 - gpa / 4)) : 326.7"
+            stroke-linecap="round"
+            class="gpa-circle-progress"
+            transform="rotate(-90 60 60)"/>
+        </svg>
+        <div class="gpa-center">
+          <div class="gpa-value">{{formatNumber(gpa)}}</div>
+          <div class="gpa-sub">/ 4.0</div>
+        </div>
+      </div>
+      <div class="gpa-info">
+        <div class="gpa-label-text">GPA Dự kiến</div>
+        <div class="gpa-badge">{{getGpaLabel()}}</div>
+        <div class="gpa-hint">Chỉ tính môn được chọn, không tính GDTC</div>
+      </div>
+    </div>
+
+    <!-- ── Line Chart ── -->
+    <div class="chart-card" *ngIf="totalSelected > 0">
+      <h3 class="section-title">
+        <i class="fas fa-chart-line text-purple-500 mr-2"></i>
+        Phân bố xếp loại
+      </h3>
+      <div class="line-chart-wrapper">
+        <svg viewBox="0 0 520 140" class="line-chart-svg" preserveAspectRatio="xMidYMid meet">
+          <!-- Grid lines -->
+          <line x1="40" y1="20" x2="40" y2="110" stroke="#e5e7eb" stroke-width="1"/>
+          <line x1="40" y1="110" x2="490" y2="110" stroke="#e5e7eb" stroke-width="1"/>
+          <line x1="40" y1="60" x2="490" y2="60" stroke="#f3f4f6" stroke-width="1" stroke-dasharray="4,4"/>
+          <!-- Area fill -->
+          <defs>
+            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <polygon *ngIf="svgPolylinePoints"
+            [attr.points]="'40,110 ' + svgPolylinePoints + ' 490,110'"
+            fill="url(#areaGrad)"/>
+          <!-- Line -->
+          <polyline *ngIf="svgPolylinePoints"
+            [attr.points]="svgPolylinePoints"
+            fill="none" stroke="#8b5cf6" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round"
+            [class.line-animate]="animating"/>
+          <!-- Dots -->
+          <g *ngFor="let dot of svgDotPoints">
+            <circle [attr.cx]="dot.x" [attr.cy]="dot.y" r="5"
+              fill="white" [attr.stroke]="dot.grade.color" stroke-width="2.5"
+              [class.dot-animate]="animating"/>
+            <!-- Label -->
+            <text [attr.x]="dot.x" [attr.y]="dot.y - 10"
+              text-anchor="middle" font-size="9" [attr.fill]="dot.grade.color" font-weight="600">
+              {{dot.grade.count > 0 ? dot.grade.count : ''}}
+            </text>
+            <!-- X label -->
+            <text [attr.x]="dot.x" y="122"
+              text-anchor="middle" font-size="9" fill="#6b7280" font-weight="500">
+              {{dot.grade.letter}}
+            </text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ── Bar Chart - Số môn theo loại ── -->
+    <div class="chart-card" *ngIf="totalSelected > 0">
+      <h3 class="section-title">
+        <i class="fas fa-bars text-indigo-500 mr-2"></i>
+        Chi tiết từng xếp loại
+      </h3>
+      <div class="bar-list">
+        <ng-container *ngFor="let stat of gradeStats">
+          <div *ngIf="stat.count > 0 || stat.letter === 'F'" class="bar-row">
+            <div class="bar-label-col">
+              <span class="grade-badge" [style.background]="stat.bgColor" [style.color]="stat.color">
+                {{stat.letter}}
+              </span>
+              <span class="bar-classification">{{stat.classification}}</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill"
+                [style.background]="stat.color"
+                [style.width.%]="animating ? getBarWidth(stat.count) : 0">
+              </div>
+            </div>
+            <div class="bar-stats">
+              <span class="bar-count" [style.color]="stat.color">{{stat.count}} môn</span>
+              <span class="bar-credits">{{stat.credits}} TC</span>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- ── Empty state ── -->
+    <div *ngIf="totalSelected === 0" class="empty-stats">
+      <i class="fas fa-chart-bar text-gray-300 text-5xl mb-4"></i>
+      <p class="text-gray-400">Chưa có môn học nào được chọn để thống kê</p>
+    </div>
+
+  </div>
+</div>

@@ -1,6 +1,5 @@
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA, isDevMode } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { ServiceWorkerModule } from '@angular/service-worker';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { FullCalendarModule } from '@fullcalendar/angular';
@@ -40,7 +39,8 @@ import { UnsavedChangesDialogComponent } from './components/scores/unsaved-chang
 import { VirtualCPACalculatorDialogComponent } from './components/scores/virtual-cpa-calculator-dialog/virtual-cpa-calculator-dialog.component';
 import { ImportScoresDialogComponent } from './components/scores/import-scores-dialog/import-scores-dialog.component';
 import { QaComponent } from './components/qa/qa.component';
-import { PwaUpdateComponent } from './components/pwa-update/pwa-update.component';
+import { VirtualScoresComponent } from './components/virtual-scores/virtual-scores.component';
+import { VirtualScoresStatsDialogComponent } from './components/virtual-scores/virtual-scores-stats-dialog/virtual-scores-stats-dialog.component';
 
 @NgModule({
   declarations: [
@@ -65,7 +65,8 @@ import { PwaUpdateComponent } from './components/pwa-update/pwa-update.component
     VirtualCPACalculatorDialogComponent,
     ImportScoresDialogComponent,
     QaComponent,
-    PwaUpdateComponent
+    VirtualScoresComponent,
+    VirtualScoresStatsDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -81,11 +82,7 @@ import { PwaUpdateComponent } from './components/pwa-update/pwa-update.component
     MatProgressSpinnerModule,
     SharedModule,
     FormsModule,
-    MatTooltipModule,
-    ServiceWorkerModule.register('ngsw-worker.js', {
-      enabled: !isDevMode(),
-      registrationStrategy: 'registerWhenStable:30000'
-    })
+    MatTooltipModule
   ],
   providers: [
     EncryptionService,

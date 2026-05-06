@@ -11,6 +11,7 @@ import { AboutComponent } from './components/about/about.component';
 import { BuyMeCoffeeComponent } from './components/buy-me-coffee/buy-me-coffee.component';
 import { FeedbackComponent } from './components/feedback/feedback.component';
 import { QaComponent } from './components/qa/qa.component';
+import { VirtualScoresComponent } from './components/virtual-scores/virtual-scores.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -20,6 +21,7 @@ const routes: Routes = [
   { path: 'scholarship', component: ScholarshipComponent },
   { path: 'virtual-calendar', component: VirtualCalendarComponent },
   { path: 'login-virtual-calendar', component: LoginVirtualCalendarComponent },
+  { path: 'virtual-scores', component: VirtualScoresComponent },
   { path: 'about', component: AboutComponent },
   { path: 'buy-me-coffee', component: BuyMeCoffeeComponent },
   { path: 'feedback', component: FeedbackComponent },

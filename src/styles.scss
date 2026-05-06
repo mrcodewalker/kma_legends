@@ -102,6 +102,16 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+// Virtual Scores Stats Dialog
+.vs-stats-dialog {
+  .mat-dialog-container {
+    padding: 0 !important;
+    border-radius: 1.25rem !important;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+  }
+}
+
 // Overlay positioning
 .cdk-overlay-pane {
   @media screen and (max-width: 768px) {

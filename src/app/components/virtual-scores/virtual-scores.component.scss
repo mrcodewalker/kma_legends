@@ -1,0 +1,100 @@
+:host { display: block; min-height: 100vh; }
+
+/* ── Login required card ─────────────────────────────────────────────────── */
+.vs-login-card {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 40px -8px rgba(109, 40, 217, 0.15), 0 4px 16px rgba(0,0,0,0.08);
+  border: 1px solid rgba(139, 92, 246, 0.12);
+}
+
+.vs-icon-ring {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #f3e8ff, #ede9fe);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 8px rgba(139, 92, 246, 0.1);
+}
+
+/* ── Page header (gradient card) ─────────────────────────────────────────── */
+.vs-page-header {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 4px 20px rgba(109, 40, 217, 0.25);
+}
+
+/* ── White content cards ─────────────────────────────────────────────────── */
+.vs-card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(139, 92, 246, 0.08);
+  overflow: hidden;
+}
+
+/* ── Table scrollbar ──────────────────────────────────────────────────────── */
+.virtual-table-container {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #c4b5fd;
+    border-radius: 4px;
+    &:hover { background: #7c3aed; }
+  }
+
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    th {
+      position: sticky;
+      top: 0;
+      background: #f9fafb;
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(180deg, rgba(0,0,0,0.08) 0%, transparent 100%);
+      }
+    }
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  th { white-space: nowrap; }
+  td { white-space: nowrap; }
+}
+
+// Grade text colours
+.text-red-500    { color: #ef4444 !important; }
+.text-red-600    { color: #dc2626 !important; }
+.text-orange-500 { color: #f97316 !important; }
+.text-orange-600 { color: #ea580c !important; }
+.text-yellow-500 { color: #eab308 !important; }
+.text-yellow-600 { color: #ca8a04 !important; }
+.text-blue-500   { color: #3b82f6 !important; }
+.text-blue-600   { color: #2563eb !important; }
+.text-green-500  { color: #22c55e !important; }
+.text-green-600  { color: #16a34a !important; }
