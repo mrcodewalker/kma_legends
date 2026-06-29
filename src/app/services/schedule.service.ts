@@ -10,13 +10,36 @@ import { createEvents, EventAttributes } from 'ics';
   providedIn: 'root'
 })
 export class ScheduleService {
-  private lessonGroups: { [key: string]: { start: string; end: string } } = {
-    '1,2,3': { start: '07:00', end: '09:25' },
-    '4,5,6': { start: '09:35', end: '12:00' },
-    '7,8,9': { start: '12:30', end: '14:55' },
-    '10,11,12': { start: '15:05', end: '17:30' },
-    '13,14,15,16': { start: '18:00', end: '20:30' }
-  };
+  getLessonTime(lessons: number[]): { startTime: string; endTime: string } {
+    if (!lessons || lessons.length === 0) {
+      return { startTime: '', endTime: '' };
+    }
+    
+    const sorted = [...lessons].sort((a, b) => a - b);
+    const minLesson = sorted[0];
+    const maxLesson = sorted[sorted.length - 1];
+
+    const lessonStartTimes: { [key: number]: string } = {
+      1: '07:00', 2: '07:45', 3: '08:40',
+      4: '09:35', 5: '10:20', 6: '11:15',
+      7: '12:30', 8: '13:15', 9: '14:10',
+      10: '15:05', 11: '15:50', 12: '16:45',
+      13: '18:00', 14: '18:45', 15: '19:40', 16: '20:25'
+    };
+
+    const lessonEndTimes: { [key: number]: string } = {
+      1: '07:45', 2: '08:30', 3: '09:25',
+      4: '10:20', 5: '11:05', 6: '12:00',
+      7: '13:15', 8: '14:00', 9: '14:55',
+      10: '15:50', 11: '16:35', 12: '17:30',
+      13: '18:45', 14: '19:30', 15: '20:25', 16: '21:10'
+    };
+
+    const startTime = lessonStartTimes[minLesson] || '';
+    const endTime = lessonEndTimes[maxLesson] || '';
+
+    return { startTime, endTime };
+  }
 
   constructor(private http: HttpClient) {}
 
@@ -26,24 +49,30 @@ export class ScheduleService {
     schedule.data.student_schedule.forEach(course => {
       const days = course.study_days.split(' ');
       const lessonsList = course.lessons.split(' ');
+      const locationsList = course.study_location ? course.study_location.split(';') : [];
       
       days.forEach((day, index) => {
-        const lessons = lessonsList[index];
-        const timeSlot = this.lessonGroups[lessons];
+        const lessonsStr = lessonsList[index];
+        if (!lessonsStr) return;
+
+        const lessons = lessonsStr.split(',').map(Number);
+        const { startTime, endTime } = this.getLessonTime(lessons);
         
-        if (!timeSlot) {
-          console.warn(`Unknown lesson group: ${lessons}`);
+        if (!startTime || !endTime) {
+          console.warn(`Unknown or invalid lessons: ${lessonsStr}`);
           return;
         }
         
-        const startDateTime = moment(`${day} ${timeSlot.start}`, 'DD/MM/YYYY HH:mm').toDate();
-        const endDateTime = moment(`${day} ${timeSlot.end}`, 'DD/MM/YYYY HH:mm').toDate();
+        const location = locationsList[index] || locationsList[0] || course.study_location || '';
+        
+        const startDateTime = moment(`${day} ${startTime}`, 'DD/MM/YYYY HH:mm').toDate();
+        const endDateTime = moment(`${day} ${endTime}`, 'DD/MM/YYYY HH:mm').toDate();
         
         events.push({
           title: `${course.course_name} (${course.course_code})`,
           start: startDateTime,
           end: endDateTime,
-          location: course.study_location,
+          location: location,
           teacher: course.teacher,
           courseCode: course.course_code
         });

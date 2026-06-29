@@ -126,32 +126,32 @@ export class VirtualCalendarComponent implements OnInit {
   }
 
   private getLessonTime(lessons: number[]): LessonTime {
-    const lessonStr = lessons.sort().join(',');
-    let startTime = '';
-    let endTime = '';
-
-    switch (lessonStr) {
-      case "1,2,3":
-        startTime = "07:00";
-        endTime = "09:25";
-        break;
-      case "4,5,6":
-        startTime = "09:35";
-        endTime = "12:00";
-        break;
-      case "7,8,9":
-        startTime = "12:30";
-        endTime = "14:55";
-        break;
-      case "10,11,12":
-        startTime = "15:05";
-        endTime = "17:30";
-        break;
-      case "13,14,15,16":
-        startTime = "18:00";
-        endTime = "20:30";
-        break;
+    if (!lessons || lessons.length === 0) {
+      return { startTime: '', endTime: '' };
     }
+
+    const sorted = [...lessons].sort((a, b) => a - b);
+    const minLesson = sorted[0];
+    const maxLesson = sorted[sorted.length - 1];
+
+    const lessonStartTimes: { [key: number]: string } = {
+      1: '07:00', 2: '07:45', 3: '08:40',
+      4: '09:35', 5: '10:20', 6: '11:15',
+      7: '12:30', 8: '13:15', 9: '14:10',
+      10: '15:05', 11: '15:50', 12: '16:45',
+      13: '18:00', 14: '18:45', 15: '19:40', 16: '20:25'
+    };
+
+    const lessonEndTimes: { [key: number]: string } = {
+      1: '07:45', 2: '08:30', 3: '09:25',
+      4: '10:20', 5: '11:05', 6: '12:00',
+      7: '13:15', 8: '14:00', 9: '14:55',
+      10: '15:50', 11: '16:35', 12: '17:30',
+      13: '18:45', 14: '19:30', 15: '20:25', 16: '21:10'
+    };
+
+    const startTime = lessonStartTimes[minLesson] || '';
+    const endTime = lessonEndTimes[maxLesson] || '';
 
     return { startTime, endTime };
   }
@@ -197,9 +197,11 @@ export class VirtualCalendarComponent implements OnInit {
         .map(item => {
           const classMatch = item.details.course_name.match(/\((C\d+)\)$/);
           const className = classMatch ? classMatch[1] : '';
-          const lessons = item.details.lessons.split(' ')[0].split(',').map(Number);
+          const lessonsStr = item.details.lessons ? item.details.lessons.split(' ')[0] : '';
+          const lessons = lessonsStr ? lessonsStr.split(',').map(Number) : [];
           const { startTime, endTime } = this.getLessonTime(lessons);
-          
+          const uniqueLocations = Array.from(new Set((item.details.study_location || '').split(';'))).filter(Boolean).join(', ');
+
           return {
             className,
             courseName: item.course_name,
@@ -207,9 +209,9 @@ export class VirtualCalendarComponent implements OnInit {
             details: item.details,
             base_time: item.base_time,
             schedule: {
-              days: item.details.study_days.split(' '),
+              days: item.details.study_days ? item.details.study_days.split(' ') : [],
               lessons,
-              location: item.details.study_location,
+              location: uniqueLocations,
               teacher: item.details.teacher,
               startTime,
               endTime
@@ -282,13 +284,27 @@ export class VirtualCalendarComponent implements OnInit {
 
       // Check for time conflicts on common days
       for (const day of commonDays) {
-        // If they have the same time on a common day, it's a conflict
-        if (newClass.schedule.startTime === existingClass.schedule.startTime) {
+        const indexNew = newClass.schedule.days.indexOf(day);
+        const indexExist = existingClass.schedule.days.indexOf(day);
+
+        const newLessonsStr = newClass.details.lessons ? newClass.details.lessons.split(' ')[indexNew] : '';
+        const existLessonsStr = existingClass.details.lessons ? existingClass.details.lessons.split(' ')[indexExist] : '';
+
+        if (!newLessonsStr || !existLessonsStr) {
+          continue;
+        }
+
+        const newLessons = newLessonsStr.split(',').map(Number);
+        const existLessons = existLessonsStr.split(',').map(Number);
+
+        const overlap = newLessons.filter(val => existLessons.includes(val));
+        if (overlap.length > 0) {
+          const { startTime, endTime } = this.getLessonTime(existLessons);
           return {
             conflictingClass: existingClass.details.course_name,
             day: day,
-            startTime: existingClass.schedule.startTime || '',
-            endTime: existingClass.schedule.endTime || ''
+            startTime: startTime || '',
+            endTime: endTime || ''
           };
         }
       }
@@ -421,8 +437,10 @@ export class VirtualCalendarComponent implements OnInit {
         );
 
         if (matchingClass) {
-          const lessons = matchingClass.details.lessons.split(' ')[0].split(',').map(Number);
+          const lessonsStr = matchingClass.details.lessons ? matchingClass.details.lessons.split(' ')[0] : '';
+          const lessons = lessonsStr ? lessonsStr.split(',').map(Number) : [];
           const { startTime, endTime } = this.getLessonTime(lessons);
+          const uniqueLocations = Array.from(new Set((matchingClass.details.study_location || '').split(';'))).filter(Boolean).join(', ');
 
           importedClasses.push({
             courseName: matchingClass.course_name,
@@ -431,9 +449,9 @@ export class VirtualCalendarComponent implements OnInit {
             details: matchingClass.details,
             base_time: matchingClass.base_time,
             schedule: {
-              days: matchingClass.details.study_days.split(' '),
+              days: matchingClass.details.study_days ? matchingClass.details.study_days.split(' ') : [],
               lessons,
-              location: matchingClass.details.study_location,
+              location: uniqueLocations,
               teacher: matchingClass.details.teacher,
               startTime,
               endTime
@@ -600,16 +618,32 @@ export class VirtualCalendarComponent implements OnInit {
     const events: EventInput[] = [];
 
     this.temporarySelectedClasses.forEach(classItem => {
-      if (!classItem.schedule?.days || !classItem.schedule?.startTime || !classItem.schedule?.endTime) {
+      if (!classItem.schedule?.days) {
         return;
       }
 
-      classItem.schedule.days.forEach(dateStr => {
+      const days = classItem.schedule.days;
+      const lessonsStrList = classItem.details.lessons ? classItem.details.lessons.split(' ') : [];
+      const locationsStrList = classItem.details.study_location ? classItem.details.study_location.split(';') : [];
+
+      days.forEach((dateStr, i) => {
+        const dayLessonsStr = lessonsStrList[i] || lessonsStrList[0] || '';
+        const dayLocation = locationsStrList[i] || locationsStrList[0] || classItem.details.study_location || '';
+
+        if (!dayLessonsStr) return;
+
+        const dayLessons = dayLessonsStr.split(',').map(Number);
+        const { startTime, endTime } = this.getLessonTime(dayLessons);
+
+        if (!startTime || !endTime) {
+          return;
+        }
+
         const [day, month, year] = dateStr.split('/').map(Number);
         const eventDate = new Date(year, month - 1, day);
 
-        const [startHours, startMinutes] = classItem.schedule!.startTime!.split(':').map(Number);
-        const [endHours, endMinutes] = classItem.schedule!.endTime!.split(':').map(Number);
+        const [startHours, startMinutes] = startTime.split(':').map(Number);
+        const [endHours, endMinutes] = endTime.split(':').map(Number);
 
         const startDateTime = new Date(eventDate);
         startDateTime.setHours(startHours, startMinutes);
@@ -618,7 +652,7 @@ export class VirtualCalendarComponent implements OnInit {
         endDateTime.setHours(endHours, endMinutes);
 
         events.push({
-          title: `${classItem.details.course_name}\n${classItem.details.teacher}\n${classItem.details.study_location}`,
+          title: `${classItem.details.course_name}\n${classItem.details.teacher}\n${dayLocation}`,
           start: startDateTime,
           end: endDateTime,
           backgroundColor: this.getRandomColor(classItem.details.course_name),
@@ -626,7 +660,7 @@ export class VirtualCalendarComponent implements OnInit {
           textColor: '#ffffff',
           extendedProps: {
             courseCode: classItem.courseCode,
-            lessons: classItem.schedule.lessons.join(', '),
+            lessons: dayLessons.join(', '),
             className: classItem.className
           }
         });
