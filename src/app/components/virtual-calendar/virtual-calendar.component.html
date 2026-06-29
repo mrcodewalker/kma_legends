@@ -59,7 +59,7 @@
               (click)="onClassSelect(classItem)">
             <td>{{classItem.details.course_name}}</td>
             <td>{{classItem.details.teacher}}</td>
-            <td>{{classItem.details.study_location}}</td>
+            <td>{{subString(classItem.schedule.location)}}</td>
             <td>{{classItem.schedule.startTime}} - {{classItem.schedule.endTime}}</td>
             <td>{{subString(classItem.schedule.days.join(', '))}}</td>
           </tr>
@@ -96,7 +96,7 @@
               (click)="onClassSelect(classItem)">
             <td>{{classItem.details.course_name}}</td>
             <td>{{classItem.details.teacher}}</td>
-            <td>{{classItem.details.study_location}}</td>
+            <td>{{subString(classItem.schedule.location)}}</td>
             <td>{{classItem.schedule.startTime}} - {{classItem.schedule.endTime}}</td>
             <td>{{subString(classItem.schedule.days.join(', '))}}</td>
             <td class="text-center">
