@@ -87,6 +87,7 @@
             <th>Địa điểm</th>
             <th>Thời gian</th>
             <th>Các ngày học</th>
+            <th class="text-center">Hành động</th>
           </tr>
         </thead>
         <tbody>
@@ -98,6 +99,14 @@
             <td>{{classItem.details.study_location}}</td>
             <td>{{classItem.schedule.startTime}} - {{classItem.schedule.endTime}}</td>
             <td>{{subString(classItem.schedule.days.join(', '))}}</td>
+            <td class="text-center">
+              <button 
+                class="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md transition-all duration-200"
+                (click)="removeClass(classItem); $event.stopPropagation()"
+                title="Xóa lớp này">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>

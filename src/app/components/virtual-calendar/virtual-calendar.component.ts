@@ -270,6 +270,13 @@ export class VirtualCalendarComponent implements OnInit {
     this.updateCalendarEvents();
   }
 
+  removeClass(classItem: SelectedClass) {
+    this.temporarySelectedClasses = this.temporarySelectedClasses.filter(
+      c => c.details.course_name !== classItem.details.course_name
+    );
+    this.updateCalendarEvents();
+  }
+
   private checkScheduleConflict(newClass: CourseClass): { conflictingClass: string; day: string; startTime: string; endTime: string } | null {
     // Check conflicts with temporary selections (excluding classes from the same course)
     const otherClasses = this.temporarySelectedClasses.filter(
