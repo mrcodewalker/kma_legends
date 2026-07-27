@@ -4,9 +4,9 @@
 // https://kma-legend.click/api/v1
 export const environment = {
   production: false,
-  apiBaseUrl: 'https://kma-legend.click/api/v1',
-  apiLocalUrl: 'https://kma-legend.click/api/v1',
-  apiCodeWalker: 'https://kma-legend.click/api/v1',
+  apiBaseUrl: 'https://kmalegend.click/api/v1',
+  apiLocalUrl: 'https://kmalegend.click/api/v1',
+  apiCodeWalker: 'https://kmalegend.click/api/v1',
   firebaseConfig: {
     apiKey: "AIzaSyBZV2gDn_9kxbNqLNhBEaQJGZG7Lv3p0Yk",
     authDomain: "kma-schedule.firebaseapp.com",
