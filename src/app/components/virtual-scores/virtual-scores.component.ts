@@ -56,7 +56,7 @@ export class VirtualScoresComponent implements OnInit {
     private dialog: MatDialog,
     private toastService: ToastService,
     private scoresService: ScoresService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadLoggedInInfo();
@@ -393,7 +393,7 @@ export class VirtualScoresComponent implements OnInit {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       disableClose: true,
-      data: { 
+      data: {
         title: 'Xóa môn học',
         message: `Bạn có chắc chắn muốn xóa môn "${subjectName}" khỏi bảng điểm ảo không?`,
         status: 'danger',

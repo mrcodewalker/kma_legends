@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ScheduleResponse, CalendarEvent } from '../models/schedule.model';
+import { ScheduleResponse, CalendarEvent, CourseSchedule } from '../models/schedule.model';
 import { environment } from '../environments/environment';
 import * as moment from 'moment';
 import { createEvents, EventAttributes } from 'ics';
@@ -44,8 +44,15 @@ export class ScheduleService {
 
   constructor(private http: HttpClient) {}
 
-  getSavedSchedules(studentCode: string): Observable<any> {
-    return this.http.post<any>(`${environment.apiLocalUrl}/schedules/by-student`, { studentCode });
+  getSavedSchedules(studentCode: string, schedule?: CourseSchedule[], label?: string): Observable<any> {
+    const payload: any = { studentCode };
+    if (Array.isArray(schedule) && schedule.length > 0) {
+      payload.schedule = schedule;
+    }
+    if (label) {
+      payload.label = label;
+    }
+    return this.http.post<any>(`${environment.apiLocalUrl}/schedules/by-student`, payload);
   }
 
   transformScheduleToEvents(schedule: ScheduleResponse): CalendarEvent[] {

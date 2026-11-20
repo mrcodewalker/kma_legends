@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { FullCalendarComponent } from '@fullcalendar/angular';
 import { CalendarOptions, EventClickArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -54,6 +55,7 @@ export class ScheduleComponent implements OnInit {
     }
   };
 
+  @ViewChild('calendar') calendarComponent?: FullCalendarComponent;
   events: CalendarEvent[] = [];
   studentInfo: any;
   loading = true;
@@ -115,9 +117,12 @@ export class ScheduleComponent implements OnInit {
 
       this.applyInitialSchedule();
 
-      // Sync saved schedules from server if not yet cached in localStorage
-      if (this.savedSchedules.length === 0 && this.studentInfo?.student_code) {
-        this.syncSavedSchedulesFromServer(this.studentInfo.student_code);
+      // Always sync with DB on F5/load: if user already has a non-cached schedule in localStorage, persist it to DB too
+      if (this.studentInfo?.student_code) {
+        const localSchedule = !this.rawScheduleResponse.data.schedule_is_cached
+          ? this.rawScheduleResponse.data.student_schedule
+          : undefined;
+        this.syncSavedSchedulesFromServer(this.studentInfo.student_code, localSchedule);
       }
 
     } catch (error) {
@@ -152,8 +157,8 @@ export class ScheduleComponent implements OnInit {
     }
   }
 
-  private syncSavedSchedulesFromServer(studentCode: string): void {
-    this.scheduleService.getSavedSchedules(studentCode).subscribe({
+  private syncSavedSchedulesFromServer(studentCode: string, localSchedule?: CourseSchedule[]): void {
+    this.scheduleService.getSavedSchedules(studentCode, localSchedule).subscribe({
       next: (res) => {
         const list = res?.data?.saved_schedules;
         if (Array.isArray(list) && list.length > 0) {
@@ -162,7 +167,9 @@ export class ScheduleComponent implements OnInit {
             this.rawScheduleResponse.data.saved_schedules = list;
             localStorage.setItem('schedule_secret', JSON.stringify(this.rawScheduleResponse));
           }
-          if (!this.rawScheduleResponse?.data?.student_schedule?.length || this.selectedScheduleId === null) {
+          const currentSelectedExists = this.selectedScheduleId !== null
+            && list.some((s: SavedSchedule) => s.id === this.selectedScheduleId);
+          if (!currentSelectedExists || this.hasNoScheduleData) {
             this.applyInitialSchedule();
           }
         }
@@ -199,6 +206,34 @@ export class ScheduleComponent implements OnInit {
     this.loadCourseColors();
     this.assignEventColors();
     this.refreshCalendarColors();
+    this.navigateCalendarToActivePeriod();
+  }
+
+  private navigateCalendarToActivePeriod(): void {
+    if (this.events.length === 0) return;
+
+    let minTime = Infinity;
+    let maxTime = -Infinity;
+    for (const ev of this.events) {
+      const startMs = new Date(ev.start).getTime();
+      if (!isNaN(startMs)) {
+        if (startMs < minTime) minTime = startMs;
+        if (startMs > maxTime) maxTime = startMs;
+      }
+    }
+    if (!isFinite(minTime) || !isFinite(maxTime)) return;
+
+    const nowMs = Date.now();
+    const targetDate = (nowMs >= minTime && nowMs <= maxTime) ? new Date(nowMs) : new Date(minTime);
+
+    this.calendarOptions = { ...this.calendarOptions, initialDate: targetDate };
+    setTimeout(() => {
+      try {
+        this.calendarComponent?.getApi()?.gotoDate(targetDate);
+      } catch {
+        // Calendar not yet mounted; initialDate will take effect on mount
+      }
+    });
   }
 
   formatSavedDate(isoDate?: string | null): string {

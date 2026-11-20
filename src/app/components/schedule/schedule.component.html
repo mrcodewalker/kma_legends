@@ -50,33 +50,57 @@
     </div>
   </div>
 
-  <!-- Saved Schedule Selector Bar -->
+  <!-- Saved Schedule Period Selector Bar -->
   <div *ngIf="!loading && !error && savedSchedules.length > 0"
-    class="bg-white border border-blue-100 rounded-lg shadow-sm mx-4 mb-4 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-    <div class="flex flex-wrap items-center gap-2">
-      <i class="fas fa-history text-blue-600"></i>
-      <span class="text-sm font-semibold text-gray-700">Lịch học đã lưu:</span>
-      <span *ngIf="isViewingCachedSchedule"
-        class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-        <i class="fas fa-archive"></i>
-        Đang xem bản lưu
-      </span>
-      <span *ngIf="!isViewingCachedSchedule"
-        class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-        <i class="fas fa-check-circle"></i>
-        Lịch hiện tại trên cổng ĐT
-      </span>
+    class="bg-white border border-blue-100 rounded-lg shadow-sm mx-4 mb-4 p-3 sm:p-4 flex flex-col gap-3">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <i class="fas fa-history text-blue-600"></i>
+        <span class="text-sm font-semibold text-gray-700">Các kỳ / lịch học đã lưu:</span>
+        <span *ngIf="isViewingCachedSchedule"
+          class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+          <i class="fas fa-archive"></i>
+          Đang xem bản lưu
+        </span>
+        <span *ngIf="!isViewingCachedSchedule"
+          class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <i class="fas fa-check-circle"></i>
+          Lịch hiện tại trên cổng ĐT
+        </span>
+      </div>
+      <div *ngIf="savedSchedules.length > 4" class="w-full sm:w-auto">
+        <label for="savedScheduleSelect" class="sr-only">Chọn lịch học</label>
+        <select id="savedScheduleSelect"
+          [ngModel]="selectedScheduleId"
+          (ngModelChange)="onSelectSavedSchedule($event)"
+          class="w-full sm:w-auto min-w-[260px] bg-gray-50 border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 px-3 py-2">
+          <option *ngFor="let item of savedSchedules" [ngValue]="item.id">
+            {{ item.label }} ({{ item.course_count }} môn){{ item.is_live ? ' · Hiện tại' : '' }}{{ item.updated_at ? ' - ' + formatSavedDate(item.updated_at) : '' }}
+          </option>
+        </select>
+      </div>
     </div>
-    <div class="flex items-center gap-2 w-full sm:w-auto">
-      <label for="savedScheduleSelect" class="sr-only">Chọn lịch học</label>
-      <select id="savedScheduleSelect"
-        [ngModel]="selectedScheduleId"
-        (ngModelChange)="onSelectSavedSchedule($event)"
-        class="w-full sm:w-auto min-w-[260px] bg-gray-50 border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 px-3 py-2">
-        <option *ngFor="let item of savedSchedules" [ngValue]="item.id">
-          {{ item.label }} ({{ item.course_count }} môn){{ item.is_live ? ' · Hiện tại' : '' }}{{ item.updated_at ? ' - ' + formatSavedDate(item.updated_at) : '' }}
-        </option>
-      </select>
+
+    <div class="flex flex-wrap gap-2">
+      <button *ngFor="let item of savedSchedules"
+        type="button"
+        (click)="onSelectSavedSchedule(item.id)"
+        [ngClass]="item.id === selectedScheduleId
+          ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+          : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-blue-50 hover:border-blue-300'"
+        class="px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all duration-150 flex items-center gap-2 text-left">
+        <i class="fas" [ngClass]="item.is_live ? 'fa-broadcast-tower' : 'fa-calendar-check'"></i>
+        <span>{{ item.label }}</span>
+        <span class="px-1.5 py-0.5 rounded text-[11px]"
+          [ngClass]="item.id === selectedScheduleId ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'">
+          {{ item.course_count }} môn
+        </span>
+        <span *ngIf="item.is_live"
+          class="px-1.5 py-0.5 rounded text-[11px]"
+          [ngClass]="item.id === selectedScheduleId ? 'bg-green-400 text-green-950' : 'bg-green-100 text-green-800'">
+          Hiện tại
+        </span>
+      </button>
     </div>
   </div>
 
@@ -131,6 +155,6 @@
 
   <!-- Calendar -->
   <div *ngIf="!loading && !error" class="calendar-wrapper w-full h-full">
-    <full-calendar [options]="calendarOptions"></full-calendar>
+    <full-calendar #calendar [options]="calendarOptions"></full-calendar>
   </div>
 </div>
