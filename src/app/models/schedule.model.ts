@@ -20,11 +20,23 @@ export interface CourseSchedule {
   lessons: string;
 }
 
+export interface SavedSchedule {
+  id: number;
+  label: string;
+  course_count: number;
+  created_at?: string | null;
+  updated_at?: string | null;
+  is_live?: boolean;
+  schedule: CourseSchedule[];
+}
+
 export interface ScheduleResponse {
   code: string;
   data: {
     student_info: StudentInfo;
     student_schedule: CourseSchedule[];
+    saved_schedules?: SavedSchedule[];
+    schedule_is_cached?: boolean;
   };
   message: string;
 }

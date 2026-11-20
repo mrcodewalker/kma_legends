@@ -87,7 +87,18 @@ export class VirtualScoresComponent implements OnInit {
   }
 
   goToLogin(): void {
-    this.router.navigate(['/schedule'], {
+    try {
+      const raw = localStorage.getItem('schedule_secret');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (!parsed?.data?.student_info?.student_code) {
+          localStorage.removeItem('schedule_secret');
+        }
+      }
+    } catch {
+      localStorage.removeItem('schedule_secret');
+    }
+    this.router.navigate(['/login'], {
       queryParams: { message: 'Vui lòng đăng nhập để sử dụng bảng điểm ảo' }
     });
   }
@@ -150,10 +161,14 @@ export class VirtualScoresComponent implements OnInit {
         // No data on server → restore from official scores
         await this.restoreFromOfficialScores();
       }
-    } catch (err) {
-      console.error('Error loading virtual table:', err);
-      this.errorMessage = 'Không thể tải dữ liệu từ server. Vui lòng thử lại.';
-      this.isDataLoadedFromServer = false;
+    } catch (err: any) {
+      if (err?.status === 404) {
+        await this.restoreFromOfficialScores();
+      } else {
+        console.error('Error loading virtual table:', err);
+        this.errorMessage = 'Không thể tải dữ liệu từ server. Vui lòng thử lại.';
+        this.isDataLoadedFromServer = false;
+      }
     } finally {
       this.isLoadingVirtualTable = false;
     }

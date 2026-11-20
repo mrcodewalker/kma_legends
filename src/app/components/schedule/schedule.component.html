@@ -50,6 +50,45 @@
     </div>
   </div>
 
+  <!-- Saved Schedule Selector Bar -->
+  <div *ngIf="!loading && !error && savedSchedules.length > 0"
+    class="bg-white border border-blue-100 rounded-lg shadow-sm mx-4 mb-4 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div class="flex flex-wrap items-center gap-2">
+      <i class="fas fa-history text-blue-600"></i>
+      <span class="text-sm font-semibold text-gray-700">Lịch học đã lưu:</span>
+      <span *ngIf="isViewingCachedSchedule"
+        class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+        <i class="fas fa-archive"></i>
+        Đang xem bản lưu
+      </span>
+      <span *ngIf="!isViewingCachedSchedule"
+        class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        <i class="fas fa-check-circle"></i>
+        Lịch hiện tại trên cổng ĐT
+      </span>
+    </div>
+    <div class="flex items-center gap-2 w-full sm:w-auto">
+      <label for="savedScheduleSelect" class="sr-only">Chọn lịch học</label>
+      <select id="savedScheduleSelect"
+        [ngModel]="selectedScheduleId"
+        (ngModelChange)="onSelectSavedSchedule($event)"
+        class="w-full sm:w-auto min-w-[260px] bg-gray-50 border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 px-3 py-2">
+        <option *ngFor="let item of savedSchedules" [ngValue]="item.id">
+          {{ item.label }} ({{ item.course_count }} môn){{ item.is_live ? ' · Hiện tại' : '' }}{{ item.updated_at ? ' - ' + formatSavedDate(item.updated_at) : '' }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Empty Schedule Notice -->
+  <div *ngIf="!loading && !error && hasNoScheduleData"
+    class="bg-amber-50 border-l-4 border-amber-400 text-amber-800 p-4 mx-4 mb-4 rounded-r-lg">
+    <div class="flex items-center gap-2">
+      <i class="fas fa-calendar-times text-amber-500"></i>
+      <span class="text-sm">Hiện tại cổng đào tạo chưa có lịch học mới và chưa có lịch học nào được lưu trước đó.</span>
+    </div>
+  </div>
+
   <!-- Color Legend Panel -->
   <div *ngIf="showColorLegend" class="bg-white border border-gray-200 rounded-lg shadow-md mx-0 mb-4 p-4">
     <div class="flex items-center justify-between mb-3">

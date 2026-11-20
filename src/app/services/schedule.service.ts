@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ScheduleResponse, CalendarEvent } from '../models/schedule.model';
+import { environment } from '../environments/environment';
 import * as moment from 'moment';
 import { createEvents, EventAttributes } from 'ics';
 
@@ -43,10 +44,15 @@ export class ScheduleService {
 
   constructor(private http: HttpClient) {}
 
+  getSavedSchedules(studentCode: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiLocalUrl}/schedules/by-student`, { studentCode });
+  }
+
   transformScheduleToEvents(schedule: ScheduleResponse): CalendarEvent[] {
     const events: CalendarEvent[] = [];
     
-    schedule.data.student_schedule.forEach(course => {
+    (schedule.data.student_schedule || []).forEach(course => {
+      if (!course.study_days || !course.lessons) return;
       const days = course.study_days.split(' ');
       const lessonsList = course.lessons.split(' ');
       const locationsList = course.study_location ? course.study_location.split(';') : [];

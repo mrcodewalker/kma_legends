@@ -6,7 +6,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { ScheduleService } from '../../services/schedule.service';
-import { ScheduleResponse, CalendarEvent } from '../../models/schedule.model';
+import { ScheduleResponse, CalendarEvent, SavedSchedule, CourseSchedule } from '../../models/schedule.model';
 import { EventDialogComponent } from './event-dialog/event-dialog.component';
 import * as moment from 'moment';
 import { ConfirmDialogComponent } from '../shared/confirm-dialog/confirm-dialog.component';
@@ -81,6 +81,11 @@ export class ScheduleComponent implements OnInit {
 
   courseColorMap: { [courseName: string]: string } = {};
   courseNames: string[] = [];
+  savedSchedules: SavedSchedule[] = [];
+  selectedScheduleId: number | null = null;
+  isViewingCachedSchedule = false;
+  hasNoScheduleData = false;
+  private rawScheduleResponse: ScheduleResponse | null = null;
 
   constructor(
     private scheduleService: ScheduleService,
@@ -98,35 +103,22 @@ export class ScheduleComponent implements OnInit {
 
       const scheduleResponse: ScheduleResponse = JSON.parse(scheduleData);
 
-      if (!scheduleResponse || !scheduleResponse.data || !scheduleResponse.data.student_info || !scheduleResponse.data.student_schedule) {
+      if (!scheduleResponse || !scheduleResponse.data || !scheduleResponse.data.student_info || !scheduleResponse.data.student_info.student_code || !scheduleResponse.data.student_schedule) {
         throw new Error('Invalid schedule data format');
       }
 
+      this.rawScheduleResponse = scheduleResponse;
       this.studentInfo = scheduleResponse.data.student_info;
-      this.events = this.scheduleService.transformScheduleToEvents(scheduleResponse);
-      this.loadCourseColors();
-      this.assignEventColors();
+      this.savedSchedules = Array.isArray(scheduleResponse.data.saved_schedules)
+        ? scheduleResponse.data.saved_schedules
+        : [];
 
-      // Map events to include location in extendedProps
-      const calendarEvents = this.events.map(event => {
-        const courseName = event.title.split('(')[0].trim();
-        const color = this.courseColorMap[courseName];
-        return {
-          ...event,
-          backgroundColor: color,
-          borderColor: color,
-          textColor: this.getContrastColor(color),
-          classNames: [],
-          extendedProps: {
-            location: event.location,
-            teacher: event.teacher,
-            courseCode: event.courseCode,
-            color  // pass color into extendedProps as fallback
-          }
-        };
-      });
+      this.applyInitialSchedule();
 
-      this.calendarOptions.events = calendarEvents;
+      // Sync saved schedules from server if not yet cached in localStorage
+      if (this.savedSchedules.length === 0 && this.studentInfo?.student_code) {
+        this.syncSavedSchedulesFromServer(this.studentInfo.student_code);
+      }
 
     } catch (error) {
       console.error('Error loading schedule data:', error);
@@ -135,6 +127,84 @@ export class ScheduleComponent implements OnInit {
     } finally {
       this.loading = false;
     }
+  }
+
+  private getSelectedScheduleStorageKey(): string {
+    return `schedule_selected_id_${this.studentInfo?.student_code || 'default'}`;
+  }
+
+  private applyInitialSchedule(): void {
+    if (!this.rawScheduleResponse) return;
+
+    if (this.savedSchedules.length > 0) {
+      const savedIdRaw = localStorage.getItem(this.getSelectedScheduleStorageKey());
+      const savedId = savedIdRaw ? Number(savedIdRaw) : null;
+      const matched = savedId ? this.savedSchedules.find(s => s.id === savedId) : null;
+      const live = this.savedSchedules.find(s => s.is_live);
+      const chosen = matched || live || this.savedSchedules[0];
+      this.selectedScheduleId = chosen.id;
+      this.isViewingCachedSchedule = Boolean(this.rawScheduleResponse.data.schedule_is_cached) || !chosen.is_live;
+      this.renderCourseSchedule(chosen.schedule);
+    } else {
+      this.selectedScheduleId = null;
+      this.isViewingCachedSchedule = Boolean(this.rawScheduleResponse.data.schedule_is_cached);
+      this.renderCourseSchedule(this.rawScheduleResponse.data.student_schedule);
+    }
+  }
+
+  private syncSavedSchedulesFromServer(studentCode: string): void {
+    this.scheduleService.getSavedSchedules(studentCode).subscribe({
+      next: (res) => {
+        const list = res?.data?.saved_schedules;
+        if (Array.isArray(list) && list.length > 0) {
+          this.savedSchedules = list;
+          if (this.rawScheduleResponse) {
+            this.rawScheduleResponse.data.saved_schedules = list;
+            localStorage.setItem('schedule_secret', JSON.stringify(this.rawScheduleResponse));
+          }
+          if (!this.rawScheduleResponse?.data?.student_schedule?.length || this.selectedScheduleId === null) {
+            this.applyInitialSchedule();
+          }
+        }
+      },
+      error: (err) => {
+        console.warn('Could not sync saved schedules:', err);
+      }
+    });
+  }
+
+  onSelectSavedSchedule(scheduleIdValue: string | number): void {
+    const id = Number(scheduleIdValue);
+    const chosen = this.savedSchedules.find(s => s.id === id);
+    if (!chosen) return;
+
+    this.selectedScheduleId = chosen.id;
+    localStorage.setItem(this.getSelectedScheduleStorageKey(), String(chosen.id));
+    this.isViewingCachedSchedule = !chosen.is_live;
+    this.renderCourseSchedule(chosen.schedule);
+  }
+
+  private renderCourseSchedule(courses: CourseSchedule[]): void {
+    const list = Array.isArray(courses) ? courses : [];
+    this.hasNoScheduleData = list.length === 0;
+    const syntheticResponse: ScheduleResponse = {
+      code: this.rawScheduleResponse?.code || '200',
+      message: this.rawScheduleResponse?.message || 'OK',
+      data: {
+        student_info: this.studentInfo,
+        student_schedule: list
+      }
+    };
+    this.events = this.scheduleService.transformScheduleToEvents(syntheticResponse);
+    this.loadCourseColors();
+    this.assignEventColors();
+    this.refreshCalendarColors();
+  }
+
+  formatSavedDate(isoDate?: string | null): string {
+    if (!isoDate) return '';
+    const parsed = moment(isoDate);
+    return parsed.isValid() ? parsed.format('DD/MM/YYYY HH:mm') : '';
   }
 
   handleEventClick(clickInfo: EventClickArg) {
